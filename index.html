@@ -1,0 +1,2075 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Absensi - UIN Ar-Raniry Banda Aceh</title>
+  <link class="uin-app-favicon" rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .bg-uin-green { background-color: #005c30; }
+    .text-uin-green { color: #005c30; }
+    .border-uin-green { border-color: #005c30; }
+    .bg-uin-gold { background-color: #d4af37; }
+    .text-uin-gold { color: #d4af37; }
+    .border-uin-gold { border-color: #d4af37; }
+    .hover-uin-green:hover { background-color: #004624; }
+    .hover-uin-gold:hover { background-color: #c29e2f; }
+
+    @keyframes scrollUp {
+      0% { transform: translateY(100%); }
+      100% { transform: translateY(-100%); }
+    }
+    .animate-scroll-vertical {
+      animation: scrollUp 45s linear infinite;
+    }
+    .pause-on-hover:hover .animate-scroll-vertical {
+      animation-play-state: paused;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); }
+      50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+    }
+    .glow-new-log {
+      animation: pulseGlow 2s infinite;
+      border-color: #10b981 !important;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- NOTIFIKASI TOAST CUSTOM -->
+  <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-100px] opacity-0 transition-all duration-300 ease-out flex items-center p-4 mb-4 w-full max-w-xs text-gray-500 bg-white rounded-xl shadow-lg border-l-4" role="alert">
+    <div id="toast-icon" class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg"></div>
+    <div id="toast-message" class="ms-3 text-sm font-semibold"></div>
+  </div>
+
+  <!-- HEADER UTAMA BRANDING -->
+  <header class="bg-uin-green text-white py-4 px-6 shadow-md border-b-4 border-uin-gold">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-12 h-12 object-contain bg-white p-1 rounded-full border-2 border-uin-gold shadow-md">
+        <div>
+          <h1 class="font-extrabold text-lg md:text-xl tracking-wide">E-ABSENSI ONLINE</h1>
+          <p class="text-xs text-uin-gold font-semibold uppercase tracking-wider">UIN Ar-Raniry Banda Aceh</p>
+        </div>
+      </div>
+      <div id="header-user-info" class="hidden flex items-center gap-3">
+        <span id="header-user-name" class="text-sm font-medium border-r border-green-600 pr-3 hidden md:inline"></span>
+        <button onclick="logout()" class="bg-uin-gold text-uin-green font-bold text-xs px-4 py-2 rounded-lg hover-uin-gold shadow-sm flex items-center gap-2 transition-transform transform active:scale-95">
+          <i class="fa-solid fa-right-from-bracket"></i> Keluar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loading" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center gap-4">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-uin-gold border-t-uin-green"></div>
+      <p class="text-sm font-semibold text-gray-700">Memproses Data...</p>
+    </div>
+  </div>
+
+  <!-- AREA KONTEN (SPA) -->
+  <main class="flex-grow flex flex-col">
+    
+    <!-- 1. HALAMAN LOGIN -->
+    <section id="page-login" class="flex-grow flex items-center justify-center p-4">
+      <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div class="bg-uin-green p-8 text-center border-b border-uin-gold flex flex-col items-center">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-20 h-24 object-contain mb-4 bg-white p-2 rounded-2xl border-2 border-uin-gold shadow-lg">
+          <h2 class="text-2xl font-bold text-white">Portal Presensi</h2>
+          <p class="text-xs text-gray-200 mt-1">Silakan masuk dengan akun Kepegawaian Anda</p>
+        </div>
+        <form id="form-login" onsubmit="handleLogin(event)" class="p-8 space-y-5">
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Username / NIP</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <i class="fa-solid fa-user"></i>
+              </span>
+              <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent text-sm transition" placeholder="Masukkan username">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Kata Sandi</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <i class="fa-solid fa-lock"></i>
+              </span>
+              <input type="password" id="login-password" required class="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-transparent text-sm transition" placeholder="••••••••">
+              <button type="button" onclick="togglePasswordVisibility('login-password', 'login-password-toggle-icon')" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+                <i id="login-password-toggle-icon" class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-uin-green text-white font-bold py-3.5 rounded-xl hover-uin-green transition shadow-lg flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Sistem
+          </button>
+          
+          <div class="relative flex py-2 items-center">
+            <div class="flex-grow border-t border-gray-200"></div>
+            <span class="flex-shrink mx-4 text-gray-400 text-xs font-bold uppercase">Mode Publik</span>
+            <div class="flex-grow border-t border-gray-200"></div>
+          </div>
+
+          <button type="button" onclick="navigateTo('page-tv')" class="w-full border-2 border-uin-gold text-uin-green font-bold py-3 rounded-xl hover:bg-amber-50 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-tv"></i> Pantau Monitor TV Display
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- 2. DASHBOARD USER -->
+    <section id="page-user" class="hidden max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Kiri: Profil & Reset Kredensial Akun -->
+        <div class="space-y-6 lg:sticky lg:top-4 h-fit">
+          <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-16 h-16 bg-uin-green text-uin-gold rounded-full flex items-center justify-center font-bold text-2xl shadow-lg border-2 border-uin-gold overflow-hidden">
+                <span id="user-avatar-initials">UIN</span>
+              </div>
+              <div>
+                <h3 id="user-full-name" class="font-extrabold text-lg text-gray-800">Nama Lengkap</h3>
+                <p id="user-department" class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Unit Kerja</p>
+                <span class="inline-flex mt-1 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <i class="fa-solid fa-shield-halved mr-1"></i> Pegawai Aktif
+                </span>
+              </div>
+            </div>
+            
+            <div class="border-t border-gray-100 pt-4 space-y-3">
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-500 font-medium">NIP / ID:</span>
+                <span id="user-display-id" class="font-semibold text-gray-800">-</span>
+              </div>
+              <div class="flex justify-between items-center text-sm">
+                <span class="text-gray-500 font-medium">Jam Kerja Hari Ini:</span>
+                <span id="user-display-workhour" class="font-semibold text-uin-green">08:00 - 16:00 WIB</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KARTU RESET USERNAME & PASSWORD MANDIRI -->
+          <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 space-y-4">
+            <h4 class="font-bold text-gray-800 text-sm flex items-center gap-2 text-uin-green border-b pb-2">
+              <i class="fa-solid fa-user-gear"></i> Pengaturan Akun Anda
+            </h4>
+            <p class="text-[11px] text-gray-500 leading-relaxed">
+              Anda diperkenankan memperbarui Username/NIP dan Kata Sandi masuk demi privasi akun kerja mandiri Anda.
+            </p>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Username / NIP Baru</label>
+                <input type="text" id="self-username" class="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Username baru">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Kata Sandi Baru</label>
+                <div class="relative">
+                  <input type="password" id="self-password" class="w-full pl-3 pr-10 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Password baru">
+                  <button type="button" onclick="togglePasswordVisibility('self-password', 'self-password-toggle-icon')" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+                    <i id="self-password-toggle-icon" class="fa-solid fa-eye text-xs"></i>
+                  </button>
+                </div>
+              </div>
+              <button onclick="saveSelfCredential()" class="w-full bg-uin-green text-white font-bold py-2 rounded-lg text-xs hover-uin-green transition shadow-sm flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan Akun
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kanan: Tombol Absensi & Rekap Kehadiran -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 border-b border-gray-100 pb-4">
+              <div>
+                <h2 class="text-xl font-extrabold text-gray-800">Presensi Presisi</h2>
+                <p class="text-xs text-gray-500">Pekerjaan harian / TUPOKSI secara otomatis terekam oleh sistem saat Anda menekan tombol absen.</p>
+              </div>
+              <div class="text-center md:text-right">
+                <div id="live-time" class="text-2xl font-bold text-uin-green tracking-wider">00:00:00</div>
+                <div id="live-date" class="text-xs font-semibold text-uin-gold uppercase">Sabtu, 11 Juli 2026</div>
+              </div>
+            </div>
+
+            <!-- Tombol Presensi / Kartu Resit Jam Digital -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 py-2">
+              <!-- Absen Datang -->
+              <div id="container-clock-in">
+                <button id="btn-clock-in" onclick="submitAttendance('in')" class="w-full relative overflow-hidden group bg-gradient-to-br from-emerald-600 to-teal-800 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform active:scale-95 text-left flex flex-col justify-between h-48">
+                  <div class="flex justify-between items-start w-full">
+                    <span class="p-3 bg-white bg-opacity-20 rounded-xl">
+                      <i class="fa-solid fa-right-to-bracket text-2xl"></i>
+                    </span>
+                    <span class="text-xs font-bold uppercase tracking-widest bg-emerald-500 bg-opacity-55 py-1 px-3 rounded-full">Absen Masuk</span>
+                  </div>
+                  <div>
+                    <p class="text-xs text-emerald-100 font-medium mb-1">Tekan untuk absensi datang</p>
+                    <h4 class="text-lg font-bold">MASUK / DATANG</h4>
+                    <p id="label-clock-in" class="text-xs text-emerald-200 mt-1 font-semibold italic">Belum tercatat</p>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Absen Pulang -->
+              <div id="container-clock-out">
+                <button id="btn-clock-out" onclick="submitAttendance('out')" class="w-full relative overflow-hidden group bg-gradient-to-br from-amber-600 to-amber-800 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform active:scale-95 text-left flex flex-col justify-between h-48">
+                  <div class="flex justify-between items-start w-full">
+                    <span class="p-3 bg-white bg-opacity-20 rounded-xl">
+                      <i class="fa-solid fa-right-from-bracket text-2xl"></i>
+                    </span>
+                    <span class="text-xs font-bold uppercase tracking-widest bg-amber-500 bg-opacity-55 py-1 px-3 rounded-full">Absen Pulang</span>
+                  </div>
+                  <div>
+                    <p class="text-xs text-amber-100 font-medium mb-1">Tekan untuk absensi pulang</p>
+                    <h4 class="text-lg font-bold">PULANG / SELESAI</h4>
+                    <p id="label-clock-out" class="text-xs text-amber-200 mt-1 font-semibold italic">Bisa ditekan kapan saja (Maksimal pukul 20:00 WIB)</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Keterangan Catatan Tambahan (Opsional)</label>
+              <input type="text" id="attendance-notes" class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Contoh: Dinas Luar, Sakit, Lokasi Gedung C, dll.">
+            </div>
+          </div>
+
+          <!-- PANEL REKAP KEHADIRAN BULAN INI USER -->
+          <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 border-b border-gray-100 pb-4">
+              <div>
+                <h3 class="text-lg font-extrabold text-gray-800">Rekap Kehadiran Pribadi</h3>
+                <p class="text-xs text-gray-500">Riwayat absensi dan pekerjaan harian Anda bulan ini.</p>
+              </div>
+              <div class="flex gap-2 items-center">
+                <select id="user-filter-month" onchange="loadUserAttendanceHistory()" class="px-2 py-1.5 text-xs rounded-lg border border-gray-200 focus:outline-none font-semibold">
+                  <option value="1">Januari</option>
+                  <option value="2">Februari</option>
+                  <option value="3">Maret</option>
+                  <option value="4">April</option>
+                  <option value="5">Mei</option>
+                  <option value="6">Juni</option>
+                  <option value="7">Juli</option>
+                  <option value="8">Agustus</option>
+                  <option value="9">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Desember</option>
+                </select>
+                <select id="user-filter-year" onchange="loadUserAttendanceHistory()" class="px-2 py-1.5 text-xs rounded-lg border border-gray-200 focus:outline-none font-semibold">
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-gray-50 text-gray-500 font-bold uppercase border-b border-gray-150">
+                    <th class="p-3">Tanggal</th>
+                    <th class="p-3">Jam Masuk</th>
+                    <th class="p-3">Jam Pulang</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Pekerjaan Direkam</th>
+                    <th class="p-3">Catatan</th>
+                  </tr>
+                </thead>
+                <tbody id="table-user-recap-body" class="divide-y divide-gray-100 text-gray-700">
+                  <!-- Diisi dinamis -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. DASHBOARD ADMIN -->
+    <section id="page-admin" class="hidden flex-grow flex flex-col lg:flex-row">
+      <aside class="w-full lg:w-64 bg-uin-green text-white flex-shrink-0 border-r border-uin-gold">
+        <div class="p-4 border-b border-green-800 text-center">
+          <p class="text-xs font-bold text-uin-gold tracking-widest uppercase">Ruang Kontrol</p>
+          <h3 class="font-extrabold text-sm mt-1">Administrator Panel</h3>
+        </div>
+        <nav class="p-2 space-y-1">
+          <button onclick="switchAdminTab('tab-overview')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl transition bg-green-900 text-uin-gold">
+            <i class="fa-solid fa-gauge"></i> Ringkasan Utama
+          </button>
+          <button onclick="switchAdminTab('tab-petugas-tugas')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition">
+            <i class="fa-solid fa-users-gear"></i> Daftar Petugas & Tugas
+          </button>
+          <button onclick="switchAdminTab('tab-manual-input')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition">
+            <i class="fa-solid fa-user-pen"></i> Input Absen Manual
+          </button>
+          <button onclick="switchAdminTab('tab-daily-report')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition">
+            <i class="fa-solid fa-calendar-day"></i> Laporan Harian
+          </button>
+          <button onclick="switchAdminTab('tab-monthly-report')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition">
+            <i class="fa-solid fa-file-invoice"></i> Laporan Bulanan
+          </button>
+          <button onclick="switchAdminTab('tab-settings-workhour')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition">
+            <i class="fa-solid fa-clock"></i> Pengaturan Jam Kerja
+          </button>
+          <div class="border-t border-green-800 my-4"></div>
+          <button onclick="navigateTo('page-tv')" class="flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-uin-gold hover:bg-amber-500 hover:text-uin-green transition">
+            <i class="fa-solid fa-tv"></i> Buka TV Display
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Area Konten Utama Admin -->
+      <main class="flex-grow p-4 md:p-6 bg-gray-50 max-w-7xl">
+        
+        <!-- Tab 3.1: Ringkasan Utama Admin -->
+        <div id="tab-overview" class="admin-tab-content space-y-6">
+          <h2 class="text-2xl font-extrabold text-gray-800">Selamat Datang, Admin</h2>
+          <p class="text-xs text-gray-500 mt-1">Berikut adalah pemantauan rekapitulasi data presensi dan capaian kerja hari ini.</p>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+              <span class="p-3 bg-emerald-100 text-uin-green rounded-xl text-xl"><i class="fa-solid fa-users"></i></span>
+              <div>
+                <h4 id="admin-stat-total-pegawai" class="text-xl font-black text-gray-800">0</h4>
+                <p class="text-xs font-semibold text-gray-500">Total Pegawai</p>
+              </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+              <span class="p-3 bg-blue-100 text-blue-600 rounded-xl text-xl"><i class="fa-solid fa-circle-check"></i></span>
+              <div>
+                <h4 id="admin-stat-hadir" class="text-xl font-black text-gray-800">0</h4>
+                <p class="text-xs font-semibold text-gray-500">Hadir Hari Ini</p>
+              </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+              <span class="p-3 bg-red-100 text-red-600 rounded-xl text-xl"><i class="fa-solid fa-circle-xmark"></i></span>
+              <div>
+                <h4 id="admin-stat-belum-hadir" class="text-xl font-black text-gray-800">0</h4>
+                <p class="text-xs font-semibold text-gray-500">Belum Absen</p>
+              </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+              <span class="p-3 bg-amber-100 text-amber-600 rounded-xl text-xl"><i class="fa-solid fa-hourglass-half"></i></span>
+              <div>
+                <h4 id="admin-stat-terlambat" class="text-xl font-black text-gray-800">0</h4>
+                <p class="text-xs font-semibold text-gray-500">Terlambat</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> Log Kehadiran & Pekerjaan Hari Ini
+            </h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-gray-50 text-gray-500 font-bold uppercase text-xs border-b border-gray-200">
+                    <th class="p-3">Nama Pegawai</th>
+                    <th class="p-3">Jam Masuk</th>
+                    <th class="p-3">Jam Pulang</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Pekerjaan Direkam</th>
+                    <th class="p-3">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-table-realtime-body" class="divide-y divide-gray-100 text-gray-700">
+                  <!-- Diisi Dinamis -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3.2: Daftar Petugas & Tugas (CRUD Dinamis) -->
+        <div id="tab-petugas-tugas" class="admin-tab-content hidden space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800">Daftar Petugas & Pengaturan Tugas</h2>
+              <p class="text-xs text-gray-500">Kelola informasi petugas, lokasi kerja, kredensial dasar, serta penugasan harian.</p>
+            </div>
+            <button onclick="openAddPetugasModal()" class="bg-uin-green text-white font-bold px-4 py-2.5 rounded-xl text-xs hover-uin-green transition flex items-center gap-2 shadow-md">
+              <i class="fa-solid fa-plus"></i> Tambah Petugas Baru
+            </button>
+          </div>
+
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div class="mb-4">
+              <input type="text" id="search-petugas-admin" onkeyup="filterPetugasTable()" class="w-full max-w-sm px-4 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Cari nama petugas atau lokasi kerja...">
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-gray-50 text-gray-500 font-bold uppercase border-b border-gray-200">
+                    <th class="p-3">NIP / ID</th>
+                    <th class="p-3">Nama Petugas</th>
+                    <th class="p-3">Username</th>
+                    <th class="p-3">Lokasi Kerja</th>
+                    <th class="p-3">Tugas Khusus Petugas</th>
+                    <th class="p-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-petugas-table-body" class="divide-y divide-gray-100 text-gray-700">
+                  <!-- Diisi Dinamis -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3.3: Input Absen Manual -->
+        <div id="tab-manual-input" class="admin-tab-content hidden space-y-6">
+          <div class="max-w-2xl bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">Input Kehadiran Pegawai Secara Manual</h2>
+            <form id="form-manual-attendance" onsubmit="handleManualAttendance(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Pilih Pegawai</label>
+                <select id="manual-user-select" required class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                  <!-- Diisi dinamis -->
+                </select>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Tanggal</label>
+                  <input type="date" id="manual-date" required class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Status Waktu</label>
+                  <select id="manual-status" class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                    <option value="Tepat Waktu">Tepat Waktu</option>
+                    <option value="Terlambat">Terlambat</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Waktu Datang (HH:MM)</label>
+                  <input type="time" id="manual-check-in" required class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Waktu Pulang (HH:MM)</label>
+                  <input type="time" id="manual-check-out" class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Keterangan Khusus</label>
+                <input type="text" id="manual-notes" class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Absen Manual oleh Admin">
+              </div>
+              <button type="submit" class="bg-uin-green text-white font-bold px-6 py-3 rounded-xl hover-uin-green transition shadow-md w-full">
+                Simpan Presensi Manual
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tab 3.4: Laporan Kehadiran Harian -->
+        <div id="tab-daily-report" class="admin-tab-content hidden space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800">Laporan Kehadiran Harian</h2>
+              <p class="text-xs text-gray-500">Gunakan filter untuk mencetak rekapitulasi kehadiran berdasarkan hari.</p>
+            </div>
+            <button onclick="printReport('print-area-daily')" class="bg-uin-green text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover-uin-green transition shadow">
+              <i class="fa-solid fa-print"></i> Cetak Laporan Harian
+            </button>
+          </div>
+
+          <div class="flex gap-4 items-end bg-white p-4 rounded-xl border border-gray-100">
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Pilih Tanggal</label>
+              <input type="date" id="daily-filter-date" onchange="loadDailyReport()" class="px-4 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none font-semibold">
+            </div>
+          </div>
+
+          <div id="print-area-daily" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div class="hidden print-header flex items-center justify-between border-b-4 border-uin-green pb-4 mb-6">
+              <div class="flex items-center gap-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-12 h-12 object-contain bg-white p-1 rounded-full border border-uin-gold">
+                <div>
+                  <h1 class="font-extrabold text-lg text-uin-green">UIN AR-RANIRY BANDA ACEH</h1>
+                  <p class="text-xs text-gray-500">LAPORAN PRESENSI HARIAN PEGAWAI</p>
+                </div>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-gray-50 text-gray-500 font-bold uppercase text-xs border-b border-gray-200">
+                    <th class="p-3">Nama Pegawai</th>
+                    <th class="p-3">ID / NIP</th>
+                    <th class="p-3">Masuk</th>
+                    <th class="p-3">Pulang</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Tugas Diselesaikan</th>
+                    <th class="p-3">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody id="table-daily-report-body" class="divide-y divide-gray-100 text-gray-700">
+                  <!-- Diisi Dinamis -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3.5: Laporan Kehadiran Bulanan -->
+        <div id="tab-monthly-report" class="admin-tab-content hidden space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800">Laporan Kehadiran Bulanan</h2>
+              <p class="text-xs text-gray-500">Rekapitulasi lengkap capaian tugas dan jam presensi per bulan.</p>
+            </div>
+            <button onclick="printReport('print-area-monthly')" class="bg-uin-green text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover-uin-green transition shadow">
+              <i class="fa-solid fa-print"></i> Cetak Laporan Bulanan
+            </button>
+          </div>
+
+          <div class="flex flex-wrap gap-4 items-end bg-white p-4 rounded-xl border border-gray-100">
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Bulan</label>
+              <select id="report-filter-month" class="px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none font-semibold">
+                <option value="1">Januari</option>
+                <option value="2">Februari</option>
+                <option value="3">Maret</option>
+                <option value="4">April</option>
+                <option value="5">Mei</option>
+                <option value="6">Juni</option>
+                <option value="7" selected>Juli</option>
+                <option value="8">Agustus</option>
+                <option value="9">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tahun</label>
+              <select id="report-filter-year" class="px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none font-semibold">
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+              </select>
+            </div>
+            <button onclick="loadMonthlyReport()" class="bg-uin-gold text-uin-green px-6 py-2.5 rounded-xl text-sm font-extrabold hover-uin-gold transition shadow">
+              Filter Data
+            </button>
+          </div>
+
+          <div id="print-area-monthly" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div class="hidden print-header flex items-center justify-between border-b-4 border-uin-green pb-4 mb-6">
+              <div class="flex items-center gap-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-12 h-12 object-contain bg-white p-1 rounded-full border border-uin-gold">
+                <div>
+                  <h1 class="font-extrabold text-lg text-uin-green">UIN AR-RANIRY BANDA ACEH</h1>
+                  <p class="text-xs text-gray-500">LAPORAN REKAPITULASI BULANAN PEGAWAI</p>
+                </div>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-gray-55 text-gray-500 font-bold uppercase text-xs border-b border-gray-200">
+                    <th class="p-3">Tanggal</th>
+                    <th class="p-3">NIP / ID</th>
+                    <th class="p-3">Nama Pegawai</th>
+                    <th class="p-3">Masuk</th>
+                    <th class="p-3">Pulang</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3">Tugas Selesai</th>
+                    <th class="p-3">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody id="table-monthly-report-body" class="divide-y divide-gray-100 text-gray-700">
+                  <!-- Diisi Dinamis -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3.6: Pengaturan Jam Kerja -->
+        <div id="tab-settings-workhour" class="admin-tab-content hidden space-y-6">
+          <div class="max-w-md bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Konfigurasi Batas Jam Kerja</h2>
+            <p class="text-xs text-gray-500 mb-6">Sesuaikan ambang batas jam kedatangan dan jam pulang kerja harian.</p>
+            <form id="form-settings" onsubmit="handleSaveSettings(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Target Batas Jam Masuk (Tepat Waktu)</label>
+                <input type="time" step="1" id="setting-checkin" required class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Target Jam Awal Pulang (Absen Keluar)</label>
+                <input type="time" step="1" id="setting-checkout" required class="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+              </div>
+              <button type="submit" class="w-full bg-uin-green text-white font-bold py-3 rounded-xl hover-uin-green transition shadow-md">
+                Simpan Konfigurasi Jam Kerja
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </main>
+    </section>
+
+    <!-- 4. MONITOR DISPLAY TV -->
+    <section id="page-tv" class="hidden flex-grow bg-slate-900 text-white p-6 flex flex-col justify-between">
+      
+      <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-4 mb-6 gap-4">
+        <div class="flex items-center gap-4">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-14 h-16 object-contain bg-white p-1.5 rounded-2xl border-2 border-uin-gold shadow-lg">
+          <div>
+            <h1 class="text-2xl font-black tracking-wide text-uin-gold">MONITOR PRESENSI & TUPOKSI DIGITAL</h1>
+            <p class="text-xs text-gray-400 tracking-wider font-bold">UIN AR-RANIRY BANDA ACEH</p>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-6">
+          <div class="text-center md:text-right">
+            <div id="tv-clock" class="text-4xl font-black text-white tracking-widest">00:00:00</div>
+            <div id="tv-date" class="text-sm font-semibold text-uin-gold">Sabtu, 11 Juli 2026</div>
+          </div>
+          <!-- Tombol Pengaktif Audio Chime -->
+          <button id="btn-toggle-sound" onclick="toggleAudio()" class="p-3 bg-slate-800 rounded-xl hover:bg-slate-700 text-rose-400 hover:text-white transition" title="Aktifkan Suara">
+            <i id="sound-icon" class="fa-solid fa-volume-xmark"></i>
+          </button>
+          <button onclick="navigateTo('page-login')" class="p-3 bg-slate-800 rounded-xl hover:bg-slate-700 text-gray-400 hover:text-white transition">
+            <i class="fa-solid fa-sign-out-alt"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+        <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+          <span class="text-xs font-bold text-slate-400 tracking-wider">TOTAL PEGAWAI</span>
+          <h2 id="tv-stat-total" class="text-4xl font-extrabold text-white mt-2">0</h2>
+        </div>
+        <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+          <span class="text-xs font-bold text-slate-400 tracking-wider">HADIR (LOG IN)</span>
+          <h2 id="tv-stat-hadir" class="text-4xl font-extrabold text-emerald-400 mt-2">0</h2>
+        </div>
+        <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+          <span class="text-xs font-bold text-slate-400 tracking-wider">TEPAT WAKTU</span>
+          <h2 id="tv-stat-tepat" class="text-4xl font-extrabold text-emerald-400 mt-2">0</h2>
+        </div>
+        <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+          <span class="text-xs font-bold text-slate-400 tracking-wider">TERLAMBAT</span>
+          <h2 id="tv-stat-terlambat" class="text-4xl font-extrabold text-rose-500 mt-2">0</h2>
+        </div>
+        <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+          <span class="text-xs font-bold text-slate-400 tracking-wider">PULANG KANTOR</span>
+          <h2 id="tv-stat-pulang" class="text-4xl font-extrabold text-sky-400 mt-2">0</h2>
+        </div>
+        <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 flex flex-col justify-between">
+          <span class="text-xs font-bold text-slate-400 tracking-wider">BELUM ABSENSI</span>
+          <h2 id="tv-stat-belum" class="text-4xl font-extrabold text-amber-500 mt-2">0</h2>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
+        
+        <!-- Tabel Log Live -->
+        <div class="lg:col-span-8 bg-slate-800 rounded-2xl border border-slate-700 p-6 flex flex-col justify-between overflow-hidden relative">
+          <div>
+            <h3 class="text-lg font-bold text-uin-gold mb-4 flex items-center gap-2 border-b border-slate-700 pb-3">
+              <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping"></span> LOG LIVE KEHADIRAN & KEGIATAN HARIAN
+            </h3>
+            
+            <div class="relative overflow-hidden h-[340px] w-full pause-on-hover">
+              <div class="absolute w-full animate-scroll-vertical">
+                <table class="w-full text-left">
+                  <thead>
+                    <tr class="text-slate-400 border-b border-slate-700 text-xs font-bold tracking-wider">
+                      <th class="pb-3">Pegawai</th>
+                      <th class="pb-3">Masuk</th>
+                      <th class="pb-3">Pulang</th>
+                      <th class="pb-3">Tugas Dilaksanakan</th>
+                      <th class="pb-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tv-table-logs-body" class="divide-y divide-slate-750 text-xs">
+                    <!-- Diisi Dinamis -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daftar Belum Absen -->
+        <div class="lg:col-span-4 bg-slate-800 rounded-2xl border border-slate-700 p-6 flex flex-col justify-between overflow-hidden relative">
+          <div>
+            <h3 class="text-lg font-bold text-slate-300 mb-4 flex items-center gap-2 border-b border-slate-700 pb-3">
+              <i class="fa-solid fa-users-slash text-amber-500"></i> BELUM MELAKUKAN ABSENSI
+            </h3>
+            
+            <div class="relative overflow-hidden h-[340px] w-full pause-on-hover">
+              <div id="tv-list-belum-hadir" class="absolute w-full animate-scroll-vertical space-y-2">
+                <!-- Diisi Dinamis -->
+              </div>
+            </div>
+          </div>
+          <div class="text-center text-[10px] text-slate-500 pt-2 border-t border-slate-750 z-10 bg-slate-800">
+            Arahkan kursor ke area teks untuk menjeda putaran.
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- KAKI HALAMAN -->
+  <footer id="app-footer" class="bg-gray-100 py-4 px-6 text-center text-xs text-gray-500 border-t border-gray-200">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+      <p>&copy; 2026 Universitas Islam Negeri Ar-Raniry Banda Aceh. Hak Cipta Dilindungi.</p>
+      <p>Modul Kepegawaian & Pusat Teknologi Informasi</p>
+    </div>
+  </footer>
+
+  <!-- MODAL EDIT/TAMBAH PETUGAS -->
+  <div id="modal-petugas" class="fixed inset-0 bg-black bg-opacity-55 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border">
+      <div class="bg-uin-green p-5 text-white flex justify-between items-center">
+        <h3 id="modal-petugas-title" class="font-bold">Form Petugas</h3>
+        <button onclick="closePetugasModal()" class="text-white hover:text-gray-200 text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="form-petugas" onsubmit="handleSavePetugas(event)" class="p-6 space-y-4">
+        <input type="hidden" id="petugas-mode" value="add">
+        
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">NIP / ID Petugas</label>
+          <input type="text" id="petugas-id" required class="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Contoh: USR006">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Username NIP</label>
+            <input type="text" id="petugas-username" required class="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Kata Sandi</label>
+            <div class="relative">
+              <input type="password" id="petugas-password" required class="w-full pl-3 pr-10 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+              <button type="button" onclick="togglePasswordVisibility('petugas-password', 'petugas-password-toggle-icon')" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+                <i id="petugas-password-toggle-icon" class="fa-solid fa-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Lengkap Petugas</label>
+          <input type="text" id="petugas-fullname" required class="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Lokasi Kerja / Unit / Fakultas</label>
+          <input type="text" id="petugas-department" required class="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Contoh: Gedung Rektorat Lt 2">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tugas Khusus Petugas (Tulis bebas, pisahkan dengan koma)</label>
+          <textarea id="petugas-assigned" rows="3" required class="w-full px-3 py-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="Kebersihan Rektorat, Perawatan taman, Membersihkan toilet lantai 2"></textarea>
+        </div>
+
+        <button type="submit" class="w-full bg-uin-green text-white font-bold py-2.5 rounded-xl text-xs hover-uin-green transition shadow-md">
+          Simpan Data Petugas
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL KONFIRMASI HAPUS -->
+  <div id="modal-confirm" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4 text-center">
+      <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl mx-auto">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="font-extrabold text-lg text-gray-800">Hapus Petugas?</h3>
+        <p class="text-xs text-gray-500 mt-1">Data petugas ini akan dihapus secara permanen dari server Google Sheets.</p>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="closeConfirmModal()" class="py-2.5 text-xs font-bold text-gray-500 bg-gray-100 rounded-xl hover:bg-gray-200 transition">Batal</button>
+        <button id="btn-confirm-delete" class="py-2.5 text-xs font-bold text-white bg-red-600 rounded-xl hover-red-700 transition">Hapus Permanen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INLINE CSS KHUSUS CETAK -->
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #print-area-daily, #print-area-daily *,
+      #print-area-monthly, #print-area-monthly * { visibility: visible; }
+      .print-header { display: flex !important; }
+      #print-area-daily, #print-area-monthly {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      #app-footer, header { display: none !important; }
+    }
+  </style>
+
+  <!-- LOGIKA UTAMA APLIKASI -->
+  <script>
+    let currentUser = null;
+    let localDB = null;
+    let audioContext = null;
+    let audioEnabled = false;
+    let previousHadirCount = 0;
+    let deleteUserIdTarget = null;
+    
+    const IS_GAS_ENVIRONMENT = typeof google !== 'undefined' && google.script && google.script.run;
+    
+    function initLocalDB() {
+      if (!localStorage.getItem('uin_users')) {
+        const dummyUsers = [
+          { userId: 'USR001', username: 'dosen1', password: '123', fullName: 'Dr. T. M. Jamil, M.A.', role: 'user', department: 'Sains dan Teknologi', assignedTasks: 'Kebersihan Kantor, Perawatan Taman, Membantu Administrasi' },
+          { userId: 'USR002', username: 'dosen2', password: '123', fullName: 'Prof. Dr. Syamsul Rijal, M.Ag.', role: 'user', department: 'Fakultas Ushuluddin', assignedTasks: 'Kebersihan Ruang Perkuliahan, Menyapu halaman' },
+          { userId: 'USR003', username: 'dosen3', password: '123', fullName: 'Dra. Nurhayati, M.Ed.', role: 'user', department: 'Tarbiyah dan Keguruan', assignedTasks: 'Kebersihan Toilet, Menjaga Kebersihan Lingkungan Kampus' },
+          { userId: 'USR004', username: 'dosen4', password: '123', fullName: 'Teuku Khairul, S.T., M.Sc.', role: 'user', department: 'Pusat Komputer (Puskom)', assignedTasks: 'Kebersihan Lingkungan, Perawatan Taman Kampus' },
+          { userId: 'USR005', username: 'dosen5', password: '123', fullName: 'Zulfian, S.Ag., M.Hum.', role: 'user', department: 'Perpustakaan Syariah', assignedTasks: 'Kebersihan Toilet dan Fasilitas Umum Perpustakaan' },
+          { userId: 'ADM001', username: 'admin', password: '1122', fullName: 'Puskom Admin Rektorat', role: 'admin', department: 'Biro Kepegawaian', assignedTasks: 'Semua Akses Kontrol Sistem' }
+        ];
+        localStorage.setItem('uin_users', JSON.stringify(dummyUsers));
+      }
+      if (!localStorage.getItem('uin_attendance')) {
+        const dummyAttendance = [
+          { id: '1', userId: 'USR001', fullName: 'Dr. T. M. Jamil, M.A.', date: '2026-07-10', checkIn: '07:45:12', checkOut: '16:05:00', status: 'Tepat Waktu', notes: 'Hadir Pagi', tasksCompleted: 'Kebersihan Kantor, Perawatan Taman, Membantu Administrasi' }
+        ];
+        localStorage.setItem('uin_attendance', JSON.stringify(dummyAttendance));
+      }
+      if (!localStorage.getItem('uin_settings')) {
+        const dummySettings = { checkInTarget: '08:00:00', checkOutTarget: '16:00:00' };
+        localStorage.setItem('uin_settings', JSON.stringify(dummySettings));
+      }
+    }
+
+    window.onload = function() {
+      initLocalDB();
+      updateClock();
+      setInterval(updateClock, 1000);
+      
+      const todayString = getLocalDateString();
+      document.getElementById('daily-filter-date').value = todayString;
+      
+      const savedUser = sessionStorage.getItem('current_user');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        setupUserEnvironment();
+      } else {
+        navigateTo('page-login');
+      }
+
+      // Detektor real-time tab syncing saat testing lokal
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'uin_attendance' && document.getElementById('page-tv').classList.contains('hidden') === false) {
+          loadTvMonitorData();
+        }
+      });
+    };
+
+    function getLocalDateString() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function navigateTo(pageId) {
+      document.querySelectorAll('main > section').forEach(section => {
+        section.classList.add('hidden');
+      });
+      document.getElementById(pageId).classList.remove('hidden');
+      
+      if (pageId === 'page-tv') {
+        document.getElementById('app-footer').classList.add('hidden');
+        document.getElementById('header-user-info').classList.add('hidden');
+        loadTvMonitorData();
+        if (window.tvInterval) clearInterval(window.tvInterval);
+        window.tvInterval = setInterval(loadTvMonitorData, 3000); // Polling cepat 3 detik
+      } else {
+        document.getElementById('app-footer').classList.remove('hidden');
+        if (window.tvInterval) clearInterval(window.tvInterval);
+        if (currentUser) {
+          document.getElementById('header-user-info').classList.remove('hidden');
+        }
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const timeStr = `${hours}:${minutes}:${seconds}`;
+      
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      const dateStr = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      
+      const liveTimeEl = document.getElementById('live-time');
+      const liveDateEl = document.getElementById('live-date');
+      const tvClockEl = document.getElementById('tv-clock');
+      const tvDateEl = document.getElementById('tv-date');
+      
+      if (liveTimeEl) liveTimeEl.textContent = timeStr;
+      if (liveDateEl) liveDateEl.textContent = dateStr;
+      if (tvClockEl) tvClockEl.textContent = timeStr;
+      if (tvDateEl) tvDateEl.textContent = dateStr;
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toast-icon');
+      const msg = document.getElementById('toast-message');
+      
+      msg.textContent = message;
+      if (type === 'success') {
+        toast.className = "fixed top-5 right-5 z-50 transform transition-all duration-300 ease-out flex items-center p-4 mb-4 w-full max-w-xs text-emerald-800 bg-emerald-50 rounded-xl shadow-lg border-l-4 border-emerald-500";
+        icon.className = "inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg bg-emerald-100 text-emerald-500";
+        icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+      } else {
+        toast.className = "fixed top-5 right-5 z-50 transform transition-all duration-300 ease-out flex items-center p-4 mb-4 w-full max-w-xs text-red-800 bg-red-50 rounded-xl shadow-lg border-l-4 border-red-500";
+        icon.className = "inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg bg-red-100 text-red-500";
+        icon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+      }
+      
+      toast.classList.remove('translate-y-[-100px]', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-100px]', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 4000);
+    }
+
+    function toggleLoading(show) {
+      const loader = document.getElementById('loading');
+      if (show) loader.classList.remove('hidden');
+      else loader.classList.add('hidden');
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const userVal = document.getElementById('login-username').value;
+      const passVal = document.getElementById('login-password').value;
+      
+      toggleLoading(true);
+      
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            toggleLoading(false);
+            if (response.success) {
+              currentUser = response.user;
+              sessionStorage.setItem('current_user', JSON.stringify(currentUser));
+              showToast('Selamat Datang di Portal Presensi UIN Ar-Raniry!');
+              setupUserEnvironment();
+            } else {
+              showToast(response.message, 'error');
+            }
+          })
+          .withFailureHandler(function(err) {
+            toggleLoading(false);
+            showToast('Koneksi Gagal: ' + err, 'error');
+          })
+          .authenticateUser(userVal, passVal);
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const users = JSON.parse(localStorage.getItem('uin_users'));
+          const found = users.find(u => u.username.toString().trim() === userVal.trim() && u.password.toString().trim() === passVal.trim());
+          if (found) {
+            currentUser = found;
+            sessionStorage.setItem('current_user', JSON.stringify(currentUser));
+            showToast('Selamat Datang! (Mode Simulasi Offline)');
+            setupUserEnvironment();
+          } else {
+            showToast('NIP / Username atau password Anda salah!', 'error');
+          }
+        }, 500);
+      }
+    }
+
+    function setupUserEnvironment() {
+      document.getElementById('header-user-info').classList.remove('hidden');
+      document.getElementById('header-user-name').textContent = currentUser.fullName;
+      
+      if (currentUser.role === 'admin') {
+        navigateTo('page-admin');
+        initAdminDashboard();
+      } else {
+        navigateTo('page-user');
+        initUserDashboard();
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      sessionStorage.removeItem('current_user');
+      document.getElementById('header-user-info').classList.add('hidden');
+      navigateTo('page-login');
+      showToast('Anda berhasil keluar.');
+    }
+
+    /**
+     * SIMPAN PERUBAHAN AKUN SECARA MANDIRI OLEH PETUGAS
+     */
+    function saveSelfCredential() {
+      const newUsername = document.getElementById('self-username').value.trim();
+      const newPassword = document.getElementById('self-password').value.trim();
+      
+      if (!newUsername || !newPassword) {
+        showToast('Form tidak boleh ada yang kosong!', 'error');
+        return;
+      }
+      
+      toggleLoading(true);
+      
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            toggleLoading(false);
+            if (response.success) {
+              currentUser = response.updatedUser;
+              sessionStorage.setItem('current_user', JSON.stringify(currentUser));
+              showToast('Kredensial Anda berhasil diperbarui!');
+              initUserDashboard();
+            } else {
+              showToast(response.message, 'error');
+            }
+          })
+          .updateCredentialSelf(currentUser.userId, newUsername, newPassword);
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const users = JSON.parse(localStorage.getItem('uin_users')) || [];
+          
+          // Periksa bentrok username di simulasi lokal
+          const isTaken = users.some(u => u.username.toLowerCase() === newUsername.toLowerCase() && u.userId !== currentUser.userId);
+          if (isTaken) {
+            showToast('Username ini sudah dipakai petugas lain!', 'error');
+            return;
+          }
+          
+          const uIdx = users.findIndex(u => u.userId === currentUser.userId);
+          if (uIdx !== -1) {
+            users[uIdx].username = newUsername;
+            users[uIdx].password = newPassword;
+            localStorage.setItem('uin_users', JSON.stringify(users));
+            
+            currentUser = users[uIdx];
+            sessionStorage.setItem('current_user', JSON.stringify(currentUser));
+            showToast('Username & Password berhasil direset!');
+            initUserDashboard();
+          }
+        }, 500);
+      }
+    }
+
+    function initUserDashboard() {
+      document.getElementById('user-full-name').textContent = currentUser.fullName;
+      document.getElementById('user-department').textContent = currentUser.department;
+      document.getElementById('user-display-id').textContent = currentUser.userId;
+      
+      // Isi isian form reset mandiri
+      document.getElementById('self-username').value = currentUser.username;
+      document.getElementById('self-password').value = currentUser.password;
+      
+      const initials = currentUser.fullName.split(' ').map(n => n[0]).slice(0, 3).join('');
+      document.getElementById('user-avatar-initials').textContent = initials;
+      
+      const today = new Date();
+      document.getElementById('user-filter-month').value = today.getMonth() + 1;
+      document.getElementById('user-filter-year').value = today.getFullYear();
+      
+      loadWorkHourInUserDashboard();
+      loadUserAttendanceHistory();
+    }
+
+    function loadWorkHourInUserDashboard() {
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(settings) {
+            document.getElementById('user-display-workhour').textContent = `${settings.checkInTarget.substring(0, 5)} - ${settings.checkOutTarget.substring(0, 5)} WIB`;
+          })
+          .getSettings();
+      } else {
+        const settings = JSON.parse(localStorage.getItem('uin_settings'));
+        if (settings) {
+          document.getElementById('user-display-workhour').textContent = `${settings.checkInTarget.substring(0, 5)} - ${settings.checkOutTarget.substring(0, 5)} WIB`;
+        }
+      }
+    }
+
+    function loadUserAttendanceHistory() {
+      const month = document.getElementById('user-filter-month').value;
+      const year = document.getElementById('user-filter-year').value;
+      const today = getLocalDateString();
+
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success) {
+              renderUserRecapTable(response.data);
+              const todayLog = response.data.find(a => a.date === today);
+              updateUserAttendanceButtons(todayLog);
+            }
+          })
+          .getUserMonthlyReport(currentUser.userId, month, year);
+      } else {
+        const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
+        const filterPrefix = `${year}-${String(month).padStart(2, '0')}`;
+        const filtered = atts.filter(a => a.userId === currentUser.userId && a.date.startsWith(filterPrefix));
+        
+        renderUserRecapTable(filtered);
+        const todayLog = atts.find(a => a.userId === currentUser.userId && a.date === today);
+        updateUserAttendanceButtons(todayLog);
+      }
+    }
+
+    function renderUserRecapTable(data) {
+      const tbody = document.getElementById('table-user-recap-body');
+      tbody.innerHTML = '';
+      
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400 font-semibold">Belum ada riwayat presensi.</td></tr>`;
+        return;
+      }
+      
+      data.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-gray-100 hover:bg-gray-50 transition duration-150";
+        const statusClass = row.status === 'Tepat Waktu' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+        
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-gray-800">${row.date}</td>
+          <td class="p-3 font-medium text-emerald-700">${row.checkIn || '-'}</td>
+          <td class="p-3 font-medium text-amber-700">${row.checkOut || '-'}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusClass}">${row.status}</span>
+          </td>
+          <td class="p-3 text-[11px] text-gray-600 max-w-[200px] truncate" title="${row.tasksCompleted || ''}">${row.tasksCompleted || '-'}</td>
+          <td class="p-3 text-gray-500 italic max-w-[120px] truncate" title="${row.notes || ''}">${row.notes || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateUserAttendanceButtons(todayLog) {
+      const containerIn = document.getElementById('container-clock-in');
+      const containerOut = document.getElementById('container-clock-out');
+      
+      // Ambil jam saat ini di client
+      const currentHour = new Date().getHours();
+      
+      // 1. RENDER KARTU DATANG / MASUK
+      if (todayLog && todayLog.checkIn) {
+        containerIn.innerHTML = `
+          <div class="border-2 border-emerald-500 bg-emerald-950/20 rounded-2xl p-6 h-48 flex flex-col justify-between shadow-inner">
+            <div class="flex justify-between items-center">
+              <span class="p-2 bg-emerald-100 text-emerald-800 rounded-lg text-sm"><i class="fa-solid fa-circle-check"></i> Masuk Sukses</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600">TERREKAM</span>
+            </div>
+            <div class="text-center py-2">
+              <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Jam Datang Terkunci</p>
+              <h3 class="text-3xl font-black text-emerald-700 tracking-wide mt-1">${todayLog.checkIn}</h3>
+              <p class="text-[11px] text-emerald-600 font-bold mt-1">${todayLog.status}</p>
+            </div>
+          </div>
+        `;
+      } else {
+        containerIn.innerHTML = `
+          <button id="btn-clock-in" onclick="submitAttendance('in')" class="w-full relative overflow-hidden group bg-gradient-to-br from-emerald-600 to-teal-800 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform active:scale-95 text-left flex flex-col justify-between h-48">
+            <div class="flex justify-between items-start w-full">
+              <span class="p-3 bg-white bg-opacity-20 rounded-xl">
+                <i class="fa-solid fa-right-to-bracket text-2xl"></i>
+              </span>
+              <span class="text-xs font-bold uppercase tracking-widest bg-emerald-500 bg-opacity-55 py-1 px-3 rounded-full">Absen Masuk</span>
+            </div>
+            <div>
+              <p class="text-xs text-emerald-100 font-medium mb-1">Tekan untuk absensi datang</p>
+              <h4 class="text-lg font-bold">MASUK / DATANG</h4>
+              <p id="label-clock-in" class="text-xs text-emerald-200 mt-1 font-semibold italic">Belum tercatat</p>
+            </div>
+          </button>
+        `;
+      }
+
+      // 2. RENDER KARTU PULANG / SELESAI (Dapat ditekan kapan saja sampai dengan pukul 20:00 WIB)
+      if (todayLog && todayLog.checkOut) {
+        containerOut.innerHTML = `
+          <div class="border-2 border-amber-500 bg-amber-950/20 rounded-2xl p-6 h-48 flex flex-col justify-between shadow-inner">
+            <div class="flex justify-between items-center">
+              <span class="p-2 bg-amber-100 text-amber-800 rounded-lg text-sm"><i class="fa-solid fa-house-chimney-user"></i> Pulang Sukses</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-600">TERREKAM</span>
+            </div>
+            <div class="text-center py-2">
+              <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Jam Pulang Terkunci</p>
+              <h3 class="text-3xl font-black text-amber-700 tracking-wide mt-1">${todayLog.checkOut}</h3>
+              <p class="text-[11px] text-amber-600 font-bold mt-1">Selesai Kerja</p>
+            </div>
+          </div>
+        `;
+      } else {
+        if (currentHour >= 20) {
+          containerOut.innerHTML = `
+            <div class="border-2 border-rose-300 bg-rose-50 rounded-2xl p-6 h-48 flex flex-col justify-between shadow-inner">
+              <div class="flex justify-between items-center">
+                <span class="p-2 bg-rose-100 text-rose-800 rounded-lg text-xs font-bold"><i class="fa-solid fa-circle-exclamation"></i> Terkunci</span>
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-rose-600">BATAS HABIS</span>
+              </div>
+              <div class="text-center py-2">
+                <p class="text-[10px] text-rose-500 font-bold uppercase tracking-widest">Absen Pulang Ditutup</p>
+                <h4 class="text-sm font-extrabold text-rose-700 mt-2">LEWAT PUKUL 20:00 WIB</h4>
+                <p class="text-[10px] text-rose-400 font-medium italic mt-1">Hubungi Administrator</p>
+              </div>
+            </div>
+          `;
+        } else {
+          containerOut.innerHTML = `
+            <button id="btn-clock-out" onclick="submitAttendance('out')" class="w-full relative overflow-hidden group bg-gradient-to-br from-amber-600 to-amber-800 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform active:scale-95 text-left flex flex-col justify-between h-48">
+              <div class="flex justify-between items-start w-full">
+                <span class="p-3 bg-white bg-opacity-20 rounded-xl">
+                  <i class="fa-solid fa-right-from-bracket text-2xl"></i>
+                </span>
+                <span class="text-xs font-bold uppercase tracking-widest bg-amber-500 bg-opacity-55 py-1 px-3 rounded-full">Absen Pulang</span>
+              </div>
+              <div>
+                <p class="text-xs text-amber-100 font-medium mb-1">Tekan untuk absensi pulang</p>
+                <h4 class="text-lg font-bold">PULANG / SELESAI</h4>
+                <p id="label-clock-out" class="text-xs text-amber-200 mt-1 font-semibold italic">Bisa ditekan kapan saja (Maksimal pukul 20:00 WIB)</p>
+              </div>
+            </button>
+          `;
+        }
+      }
+    }
+
+    function submitAttendance(type) {
+      const notes = document.getElementById('attendance-notes').value.trim();
+      const tasksStr = currentUser.assignedTasks || 'Tugas Umum Operasional Harian';
+      
+      if (type === 'out') {
+        const nowHour = new Date().getHours();
+        if (nowHour >= 20) {
+          showToast('Absen pulang ditolak: Batas waktu maksimal adalah pukul 20:00 WIB!', 'error');
+          return;
+        }
+      }
+
+      toggleLoading(true);
+
+      if (IS_GAS_ENVIRONMENT) {
+        if (type === 'in') {
+          google.script.run
+            .withSuccessHandler(function(res) {
+              toggleLoading(false);
+              if (res.success) {
+                showToast(res.message);
+                document.getElementById('attendance-notes').value = '';
+                loadUserAttendanceHistory();
+              } else {
+                showToast(res.message, 'error');
+              }
+            })
+            .clockIn(currentUser.userId, notes, tasksStr);
+        } else {
+          google.script.run
+            .withSuccessHandler(function(res) {
+              toggleLoading(false);
+              if (res.success) {
+                showToast(res.message);
+                document.getElementById('attendance-notes').value = '';
+                loadUserAttendanceHistory();
+              } else {
+                showToast(res.message, 'error');
+              }
+            })
+            .clockOut(currentUser.userId, notes, tasksStr);
+        }
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
+          const today = getLocalDateString();
+          const time = new Date().toTimeString().split(' ')[0];
+          
+          if (type === 'in') {
+            const hasIn = atts.some(a => a.userId === currentUser.userId && a.date === today);
+            if (hasIn) {
+              showToast('Gagal: Anda sudah mengonfirmasi kehadiran datang hari ini!', 'error');
+              return;
+            }
+            const settings = JSON.parse(localStorage.getItem('uin_settings')) || { checkInTarget: '08:00:00' };
+            const limit = new Date(today + 'T' + settings.checkInTarget);
+            const cur = new Date();
+            const status = cur > limit ? 'Terlambat' : 'Tepat Waktu';
+            
+            atts.push({
+              id: 'ATT_' + Date.now(),
+              userId: currentUser.userId,
+              fullName: currentUser.fullName,
+              date: today,
+              checkIn: time,
+              checkOut: '',
+              status: status,
+              notes: notes,
+              tasksCompleted: tasksStr
+            });
+            showToast(`Absen datang sukses (${status})!`);
+          } else {
+            const index = atts.findIndex(a => a.userId === currentUser.userId && a.date === today);
+            if (index === -1) {
+              // Mode simulasi offline: Izinkan penulisan absen pulang instan walau absen masuk belum terbuat
+              atts.push({
+                id: 'ATT_' + Date.now(),
+                userId: currentUser.userId,
+                fullName: currentUser.fullName,
+                date: today,
+                checkIn: '',
+                checkOut: time,
+                status: 'Tepat Waktu',
+                notes: notes,
+                tasksCompleted: tasksStr
+              });
+              showToast('Absensi pulang berhasil dicatat (Trek Mandiri)!');
+            } else {
+              atts[index].checkOut = time;
+              if (notes) atts[index].notes = notes;
+              atts[index].tasksCompleted = tasksStr;
+              showToast('Absensi pulang berhasil dicatat!');
+            }
+          }
+          
+          localStorage.setItem('uin_attendance', JSON.stringify(atts));
+          document.getElementById('attendance-notes').value = '';
+          loadUserAttendanceHistory();
+        }, 500);
+      }
+    }
+
+    /**
+     * ADMINISTRATOR PANEL LOGIC
+     */
+    function switchAdminTab(tabId) {
+      document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+      
+      document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.className = "admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition";
+      });
+      event.currentTarget.className = "admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl bg-green-900 text-uin-gold";
+      
+      if (tabId === 'tab-overview') loadAdminOverview();
+      else if (tabId === 'tab-petugas-tugas') loadAdminPetugasTab();
+      else if (tabId === 'tab-manual-input') loadAdminManualForm();
+      else if (tabId === 'tab-daily-report') loadDailyReport();
+      else if (tabId === 'tab-monthly-report') loadMonthlyReport();
+      else if (tabId === 'tab-settings-workhour') loadAdminSettingsForm();
+    }
+
+    function initAdminDashboard() {
+      loadAdminOverview();
+    }
+
+    function loadAdminOverview() {
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success) {
+              document.getElementById('admin-stat-total-pegawai').textContent = response.stats.totalPegawai;
+              document.getElementById('admin-stat-hadir').textContent = response.stats.hadir;
+              document.getElementById('admin-stat-belum-hadir').textContent = response.stats.belumHadir;
+              document.getElementById('admin-stat-terlambat').textContent = response.stats.terlambat;
+              renderRealtimeTable(response.hadirList);
+            }
+          })
+          .getRealtimeStats();
+      } else {
+        const users = JSON.parse(localStorage.getItem('uin_users')).filter(u => u.role === 'user');
+        const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
+        const today = getLocalDateString();
+        const todayAtts = atts.filter(a => a.date === today);
+        const lambat = todayAtts.filter(a => a.status === 'Terlambat').length;
+        
+        document.getElementById('admin-stat-total-pegawai').textContent = users.length;
+        document.getElementById('admin-stat-hadir').textContent = todayAtts.length;
+        document.getElementById('admin-stat-belum-hadir').textContent = users.length - todayAtts.length;
+        document.getElementById('admin-stat-terlambat').textContent = lambat;
+        
+        renderRealtimeTable(todayAtts);
+      }
+    }
+
+    function renderRealtimeTable(list) {
+      const tbody = document.getElementById('admin-table-realtime-body');
+      tbody.innerHTML = '';
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400 font-semibold">Belum ada presensi harian terekam.</td></tr>`;
+        return;
+      }
+      list.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-gray-100 hover:bg-gray-50";
+        const statusClass = row.status === 'Tepat Waktu' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+        
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-gray-800">${row.fullName}</td>
+          <td class="p-3 font-medium text-emerald-700">${row.checkIn || '-'}</td>
+          <td class="p-3 font-medium text-amber-700">${row.checkOut || '-'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusClass}">${row.status}</span></td>
+          <td class="p-3 text-xs text-gray-600 max-w-[280px] truncate" title="${row.tasksCompleted || ''}">${row.tasksCompleted || '-'}</td>
+          <td class="p-3 text-xs text-gray-500 max-w-[120px] truncate" title="${row.notes || ''}">${row.notes || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /**
+     * CRUD PETUGAS TAB MENU
+     */
+    function loadAdminPetugasTab() {
+      toggleLoading(true);
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            toggleLoading(false);
+            if (res.success) {
+              renderAdminPetugasTable(res.data);
+            }
+          })
+          .getUsersList();
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const users = JSON.parse(localStorage.getItem('uin_users')).filter(u => u.role === 'user');
+          renderAdminPetugasTable(users);
+        }, 300);
+      }
+    }
+
+    function renderAdminPetugasTable(data) {
+      const tbody = document.getElementById('admin-petugas-table-body');
+      tbody.innerHTML = '';
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">Tidak ada data petugas.</td></tr>`;
+        return;
+      }
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-gray-100 hover:bg-gray-50 text-xs";
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-gray-500">${row.userId}</td>
+          <td class="p-3 font-bold text-gray-800">${row.fullName}</td>
+          <td class="p-3 font-medium text-slate-500">${row.username}</td>
+          <td class="p-3 font-semibold text-uin-green">${row.department}</td>
+          <td class="p-3 text-gray-600 max-w-[240px] truncate" title="${row.assignedTasks}">${row.assignedTasks || 'Belum diatur'}</td>
+          <td class="p-3 text-center">
+            <div class="flex justify-center gap-2">
+              <button onclick='openEditPetugasModal(${JSON.stringify(row)})' class="bg-amber-500 hover:bg-amber-600 text-white font-bold p-1.5 rounded-lg text-[10px]"><i class="fa-solid fa-user-pen"></i> Edit</button>
+              <button onclick="confirmDeletePetugas('${row.userId}')" class="bg-rose-500 hover:bg-rose-600 text-white font-bold p-1.5 rounded-lg text-[10px]"><i class="fa-solid fa-trash-can"></i> Hapus</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterPetugasTable() {
+      const query = document.getElementById('search-petugas-admin').value.toLowerCase();
+      const rows = document.querySelectorAll('#admin-petugas-table-body tr');
+      rows.forEach(row => {
+        const name = row.cells[1]?.textContent.toLowerCase() || '';
+        const dept = row.cells[3]?.textContent.toLowerCase() || '';
+        if (name.includes(query) || dept.includes(query)) {
+          row.classList.remove('hidden');
+        } else {
+          row.classList.add('hidden');
+        }
+      });
+    }
+
+    function openAddPetugasModal() {
+      document.getElementById('form-petugas').reset();
+      document.getElementById('petugas-mode').value = 'add';
+      document.getElementById('petugas-id').disabled = false;
+      document.getElementById('modal-petugas-title').textContent = 'Tambah Petugas Baru';
+      document.getElementById('modal-petugas').classList.remove('hidden');
+    }
+
+    function openEditPetugasModal(data) {
+      document.getElementById('petugas-mode').value = 'edit';
+      document.getElementById('petugas-id').value = data.userId;
+      document.getElementById('petugas-id').disabled = true;
+      document.getElementById('petugas-username').value = data.username;
+      document.getElementById('petugas-password').value = data.password;
+      document.getElementById('petugas-fullname').value = data.fullName;
+      document.getElementById('petugas-department').value = data.department;
+      document.getElementById('petugas-assigned').value = data.assignedTasks || '';
+      
+      document.getElementById('modal-petugas-title').textContent = 'Edit Data Petugas';
+      document.getElementById('modal-petugas').classList.remove('hidden');
+    }
+
+    function closePetugasModal() {
+      document.getElementById('modal-petugas').classList.add('hidden');
+    }
+
+    function handleSavePetugas(event) {
+      event.preventDefault();
+      const mode = document.getElementById('petugas-mode').value;
+      const userId = document.getElementById('petugas-id').value.trim();
+      const username = document.getElementById('petugas-username').value.trim();
+      const password = document.getElementById('petugas-password').value.trim();
+      const fullName = document.getElementById('petugas-fullname').value.trim();
+      const department = document.getElementById('petugas-department').value.trim();
+      const assignedTasks = document.getElementById('petugas-assigned').value.trim();
+      
+      toggleLoading(true);
+      closePetugasModal();
+
+      if (IS_GAS_ENVIRONMENT) {
+        if (mode === 'add') {
+          google.script.run
+            .withSuccessHandler(function(res) {
+              toggleLoading(false);
+              if (res.success) {
+                showToast(res.message);
+                loadAdminPetugasTab();
+              } else {
+                showToast(res.message, 'error');
+              }
+            })
+            .adminAddUser(userId, username, password, fullName, department, assignedTasks);
+        } else {
+          google.script.run
+            .withSuccessHandler(function(res) {
+              toggleLoading(false);
+              if (res.success) {
+                showToast(res.message);
+                loadAdminPetugasTab();
+              } else {
+                showToast(res.message, 'error');
+              }
+            })
+            .adminUpdateUser(userId, fullName, department, assignedTasks, username, password);
+        }
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const users = JSON.parse(localStorage.getItem('uin_users')) || [];
+          if (mode === 'add') {
+            const collision = users.some(u => u.username.toLowerCase() === username.toLowerCase() || u.userId === userId);
+            if (collision) {
+              showToast('Gagal: NIP / Username sudah ada di database!', 'error');
+              return;
+            }
+            users.push({ userId, username, password, fullName, role: 'user', department, assignedTasks });
+            showToast('Petugas berhasil ditambahkan!');
+          } else {
+            const idx = users.findIndex(u => u.userId === userId);
+            if (idx !== -1) {
+              users[idx].username = username;
+              users[idx].password = password;
+              users[idx].fullName = fullName;
+              users[idx].department = department;
+              users[idx].assignedTasks = assignedTasks;
+              showToast('Informasi Petugas diperbarui!');
+            }
+          }
+          localStorage.setItem('uin_users', JSON.stringify(users));
+          loadAdminPetugasTab();
+        }, 500);
+      }
+    }
+
+    function confirmDeletePetugas(userId) {
+      deleteUserIdTarget = userId;
+      document.getElementById('btn-confirm-delete').onclick = executeDeletePetugas;
+      document.getElementById('modal-confirm').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('modal-confirm').classList.add('hidden');
+      deleteUserIdTarget = null;
+    }
+
+    function executeDeletePetugas() {
+      const targetId = deleteUserIdTarget;
+      closeConfirmModal();
+      toggleLoading(true);
+
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            toggleLoading(false);
+            if (res.success) {
+              showToast(res.message);
+              loadAdminPetugasTab();
+            } else {
+              showToast(res.message, 'error');
+            }
+          })
+          .adminDeleteUser(targetId);
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          let users = JSON.parse(localStorage.getItem('uin_users')) || [];
+          users = users.filter(u => u.userId !== targetId);
+          localStorage.setItem('uin_users', JSON.stringify(users));
+          showToast('Petugas dihapus secara permanen.');
+          loadAdminPetugasTab();
+        }, 400);
+      }
+    }
+
+    /**
+     * KONTROL INPUT ABSEN MANUAL ADMIN
+     */
+    function loadAdminManualForm() {
+      const select = document.getElementById('manual-user-select');
+      select.innerHTML = '<option value="">-- Pilih Pegawai --</option>';
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res.success) {
+              res.data.forEach(user => {
+                const opt = document.createElement('option');
+                opt.value = user.userId;
+                opt.textContent = `${user.fullName} (${user.department})`;
+                select.appendChild(opt);
+              });
+            }
+          })
+          .getUsersList();
+      } else {
+        const users = JSON.parse(localStorage.getItem('uin_users')).filter(u => u.role === 'user');
+        users.forEach(user => {
+          const opt = document.createElement('option');
+          opt.value = user.userId;
+          opt.textContent = `${user.fullName} (${user.department})`;
+          select.appendChild(opt);
+        });
+      }
+    }
+
+    function handleManualAttendance(event) {
+      event.preventDefault();
+      const userId = document.getElementById('manual-user-select').value;
+      const date = document.getElementById('manual-date').value;
+      const status = document.getElementById('manual-status').value;
+      const checkIn = document.getElementById('manual-check-in').value;
+      const checkOut = document.getElementById('manual-check-out').value;
+      const notes = document.getElementById('manual-notes').value;
+
+      if (!userId) {
+        showToast('Silakan tentukan pegawai.', 'error');
+        return;
+      }
+      toggleLoading(true);
+
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            toggleLoading(false);
+            if (res.success) {
+              showToast(res.message);
+              document.getElementById('form-manual-attendance').reset();
+            } else {
+              showToast(res.message, 'error');
+            }
+          })
+          .adminAddAttendance(userId, date, checkIn, checkOut, status, notes, 'Tugas Operasional Umum Harian');
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
+          const users = JSON.parse(localStorage.getItem('uin_users'));
+          const user = users.find(u => u.userId === userId);
+          atts.push({
+            id: 'ATT_MAN_' + Date.now(),
+            userId,
+            fullName: user.fullName,
+            date,
+            checkIn: checkIn ? checkIn + ':00' : '',
+            checkOut: checkOut ? checkOut + ':00' : '',
+            status,
+            notes: notes || 'Absen Manual oleh Admin',
+            tasksCompleted: user.assignedTasks || 'Tugas Umum Operasional Harian'
+          });
+          localStorage.setItem('uin_attendance', JSON.stringify(atts));
+          showToast('Absensi Manual berhasil terekam!');
+          document.getElementById('form-manual-attendance').reset();
+        }, 500);
+      }
+    }
+
+    /**
+     * LAPORAN HARIAN & BULANAN ADMIN
+     */
+    function loadDailyReport() {
+      const selectedDate = document.getElementById('daily-filter-date').value;
+      if (!selectedDate) return;
+      toggleLoading(true);
+
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            toggleLoading(false);
+            if (res.success) {
+              const dailyData = res.data.filter(a => a.date === selectedDate);
+              renderDailyReportTable(dailyData);
+            }
+          })
+          .getMonthlyReport(selectedDate.split('-')[1], selectedDate.split('-')[0]);
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
+          const daily = atts.filter(a => a.date === selectedDate);
+          renderDailyReportTable(daily);
+        }, 300);
+      }
+    }
+
+    function renderDailyReportTable(data) {
+      const tbody = document.getElementById('table-daily-report-body');
+      tbody.innerHTML = '';
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-400">Tidak ada data kehadiran pada hari ini.</td></tr>`;
+        return;
+      }
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-gray-100 text-xs hover:bg-slate-50";
+        const statusStyle = row.status === 'Tepat Waktu' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+        tr.innerHTML = `
+          <td class="p-3 font-bold text-gray-800">${row.fullName}</td>
+          <td class="p-3 font-semibold text-slate-500">${row.userId}</td>
+          <td class="p-3 font-medium text-emerald-700">${row.checkIn || '-'}</td>
+          <td class="p-3 font-medium text-amber-700">${row.checkOut || '-'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${statusStyle}">${row.status}</span></td>
+          <td class="p-3 text-slate-700 max-w-[200px] truncate" title="${row.tasksCompleted || ''}">${row.tasksCompleted || '-'}</td>
+          <td class="p-3 italic text-gray-500 max-w-[120px] truncate" title="${row.notes || ''}">${row.notes || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadMonthlyReport() {
+      const month = document.getElementById('report-filter-month').value;
+      const year = document.getElementById('report-filter-year').value;
+      toggleLoading(true);
+
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            toggleLoading(false);
+            if (response.success) {
+              renderMonthlyReportTable(response.data);
+            }
+          })
+          .getMonthlyReport(month, year);
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
+          const prefix = `${year}-${String(month).padStart(2, '0')}`;
+          const filtered = atts.filter(a => a.date.startsWith(prefix));
+          renderMonthlyReportTable(filtered);
+        }, 400);
+      }
+    }
+
+    function renderMonthlyReportTable(data) {
+      const tbody = document.getElementById('table-monthly-report-body');
+      tbody.innerHTML = '';
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-400 font-semibold">Tidak ada data bulanan.</td></tr>`;
+        return;
+      }
+      data.sort((a, b) => new Date(b.date) - new Date(a.date));
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-gray-100 text-xs hover:bg-slate-50";
+        const statusStyle = row.status === 'Tepat Waktu' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-500">${row.date}</td>
+          <td class="p-3 font-semibold text-slate-500">${row.userId}</td>
+          <td class="p-3 font-bold text-gray-800">${row.fullName}</td>
+          <td class="p-3 font-medium text-emerald-700">${row.checkIn || '-'}</td>
+          <td class="p-3 font-medium text-amber-700">${row.checkOut || '-'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${statusStyle}">${row.status}</span></td>
+          <td class="p-3 text-slate-600 max-w-[200px] truncate" title="${row.tasksCompleted || ''}">${row.tasksCompleted || '-'}</td>
+          <td class="p-3 italic text-gray-400 max-w-[120px] truncate" title="${row.notes || ''}">${row.notes || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /**
+     * PENGATURAN JAM KERJA DI PANEL ADMIN
+     */
+    function loadAdminSettingsForm() {
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(settings) {
+            document.getElementById('setting-checkin').value = settings.checkInTarget;
+            document.getElementById('setting-checkout').value = settings.checkOutTarget;
+          })
+          .getSettings();
+      } else {
+        const settings = JSON.parse(localStorage.getItem('uin_settings')) || { checkInTarget: '08:00:00', checkOutTarget: '16:00:00' };
+        document.getElementById('setting-checkin').value = settings.checkInTarget;
+        document.getElementById('setting-checkout').value = settings.checkOutTarget;
+      }
+    }
+
+    function handleSaveSettings(event) {
+      event.preventDefault();
+      const inVal = document.getElementById('setting-checkin').value;
+      const outVal = document.getElementById('setting-checkout').value;
+      toggleLoading(true);
+
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            toggleLoading(false);
+            if (res.success) {
+              showToast(res.message);
+            } else {
+              showToast(res.message, 'error');
+            }
+          })
+          .saveSettings(inVal, outVal);
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const settings = { checkInTarget: inVal, checkOutTarget: outVal };
+          localStorage.setItem('uin_settings', JSON.stringify(settings));
+          showToast('Jam kerja lokal berhasil disesuaikan!');
+        }, 400);
+      }
+    }
+
+    function printReport(areaId) {
+      window.print();
+    }
+
+    /**
+     * TV MONITOR DISPLAY REAL-TIME & AUDIO API SYSTEM
+     */
+    function toggleAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      audioEnabled = !audioEnabled;
+      const btn = document.getElementById('btn-toggle-sound');
+      const icon = document.getElementById('sound-icon');
+      if (audioEnabled) {
+        btn.className = "p-3 bg-emerald-800 rounded-xl hover:bg-emerald-700 text-white transition";
+        icon.className = "fa-solid fa-volume-high";
+        btn.title = "Matikan Suara";
+        playChime(); // Tes chime saat diaktifkan
+      } else {
+        btn.className = "p-3 bg-slate-800 rounded-xl hover:bg-slate-700 text-rose-400 hover:text-white transition";
+        icon.className = "fa-solid fa-volume-xmark";
+        btn.title = "Aktifkan Suara";
+      }
+    }
+
+    function playChime() {
+      if (!audioEnabled || !audioContext) return;
+      try {
+        const osc1 = audioContext.createOscillator();
+        const osc2 = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+        osc1.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.15); // E5
+
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(1046.50, audioContext.currentTime); // C6
+        osc2.frequency.setValueAtTime(1318.51, audioContext.currentTime + 0.15); // E6
+
+        gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.8);
+
+        osc1.start();
+        osc2.start();
+        osc1.stop(audioContext.currentTime + 0.85);
+        osc2.stop(audioContext.currentTime + 0.85);
+      } catch (e) {
+        console.error("Audio error: " + e);
+      }
+    }
+
+    function loadTvMonitorData() {
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            if (response.success) {
+              const oldCache = localStorage.getItem('UIN_TV_DATA_CACHE');
+              let isNew = false;
+              if (oldCache) {
+                const oldData = JSON.parse(oldCache);
+                if (response.stats.hadir > oldData.stats.hadir) {
+                  isNew = true;
+                }
+              }
+              localStorage.setItem('UIN_TV_DATA_CACHE', JSON.stringify(response));
+              renderTvMonitor(response.stats, response.hadirList, response.belumHadirList, isNew);
+            }
+          })
+          .getRealtimeStats();
+      } else {
+        const users = JSON.parse(localStorage.getItem('uin_users')).filter(u => u.role === 'user');
+        const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
+        const today = getLocalDateString();
+        
+        const todayAtts = atts.filter(a => a.date === today);
+        const tepat = todayAtts.filter(a => a.status === 'Tepat Waktu').length;
+        const lambat = todayAtts.filter(a => a.status === 'Terlambat').length;
+        const pulang = todayAtts.filter(a => a.checkOut !== '').length;
+        
+        const loggedUserIds = todayAtts.map(a => a.userId);
+        const belum = users.filter(u => !loggedUserIds.includes(u.userId));
+        
+        const stats = {
+          totalPegawai: users.length,
+          hadir: todayAtts.length,
+          belumHadir: belum.length,
+          tepatWaktu: tepat,
+          terlambat: lambat,
+          pulang: pulang
+        };
+        
+        const oldHadir = parseInt(document.getElementById('tv-stat-hadir').textContent) || 0;
+        const isNew = stats.hadir > oldHadir;
+        
+        renderTvMonitor(stats, todayAtts, belum, isNew);
+      }
+    }
+
+    function renderTvMonitor(stats, hadirList, belumHadirList, isNewDataIn) {
+      document.getElementById('tv-stat-total').textContent = stats.totalPegawai;
+      document.getElementById('tv-stat-hadir').textContent = stats.hadir;
+      document.getElementById('tv-stat-tepat').textContent = stats.tepatWaktu;
+      document.getElementById('tv-stat-terlambat').textContent = stats.terlambat;
+      document.getElementById('tv-stat-pulang').textContent = stats.pulang;
+      document.getElementById('tv-stat-belum').textContent = stats.belumHadir;
+      
+      const tbody = document.getElementById('tv-table-logs-body');
+      tbody.innerHTML = '';
+      
+      if (hadirList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Menunggu petugas absensi hari ini...</td></tr>`;
+      } else {
+        // Urutkan real-time log: Yang baru absen diletakkan paling atas (Newest First)
+        hadirList.sort((a, b) => {
+          const tA = a.checkIn || '00:00:00';
+          const tB = b.checkIn || '00:00:00';
+          return tB.localeCompare(tA);
+        });
+
+        hadirList.forEach((row, index) => {
+          const tr = document.createElement('tr');
+          
+          // Flash efek gemetar dan glow jika data baru masuk
+          const isLatest = index === 0 && isNewDataIn;
+          tr.className = `border-b border-slate-750 transition-all duration-300 ${isLatest ? 'glow-new-log bg-emerald-950/40' : 'hover:bg-slate-800/50'}`;
+          
+          const statusStyle = row.status === 'Tepat Waktu' ? 'text-emerald-400 font-extrabold' : 'text-rose-400 font-extrabold';
+          
+          tr.innerHTML = `
+            <td class="py-4 font-bold text-white flex items-center gap-2">
+              ${isLatest ? '<span class="px-2 py-0.5 bg-emerald-500 text-slate-900 rounded-md font-black text-[9px] animate-bounce">BARU</span>' : ''}
+              ${row.fullName}
+            </td>
+            <td class="py-4 font-medium text-slate-300"><i class="fa-solid fa-clock text-emerald-500 mr-1.5"></i>${row.checkIn || '-'}</td>
+            <td class="py-4 font-medium text-slate-300"><i class="fa-solid fa-clock text-amber-500 mr-1.5"></i>${row.checkOut || '-'}</td>
+            <td class="py-4 text-slate-400 max-w-[200px] truncate" title="${row.tasksCompleted || ''}">${row.tasksCompleted || '-'}</td>
+            <td class="py-4"><span class="${statusStyle}">${row.status}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        if (isNewDataIn) {
+          playChime();
+        }
+      }
+      
+      const listContainer = document.getElementById('tv-list-belum-hadir');
+      listContainer.innerHTML = '';
+      
+      if (belumHadirList.length === 0) {
+        listContainer.innerHTML = `
+          <div class="bg-emerald-950/40 p-4 rounded-xl border border-emerald-800 text-center text-emerald-400 font-bold">
+            <i class="fa-solid fa-circle-check mr-2"></i> Semua petugas telah hadir hari ini!
+          </div>
+        `;
+      } else {
+        belumHadirList.forEach(user => {
+          const div = document.createElement('div');
+          div.className = "bg-slate-750/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center";
+          div.innerHTML = `
+            <div>
+              <h5 class="text-xs font-bold text-white">${user.fullName}</h5>
+              <p class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">${user.department || 'Dosen / Staf'}</p>
+            </div>
+            <span class="text-[9px] font-extrabold px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-md border border-amber-500/20">BELUM ABSEN</span>
+          `;
+          listContainer.appendChild(div);
+        });
+      }
+    }
+
+    /**
+     * TOGGLE PASSWORD VISIBILITY FUNCTION
+     */
+    function togglePasswordVisibility(inputId, iconId) {
+      const passwordInput = document.getElementById(inputId);
+      const toggleIcon = document.getElementById(iconId);
+      
+      if (passwordInput && toggleIcon) {
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          toggleIcon.classList.remove("fa-eye");
+          toggleIcon.classList.add("fa-eye-slash");
+        } else {
+          passwordInput.type = "password";
+          toggleIcon.classList.remove("fa-eye-slash");
+          toggleIcon.classList.add("fa-eye");
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+
+```
