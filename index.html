@@ -7,7 +7,7 @@
   <link class="uin-app-favicon" rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -40,6 +40,116 @@
       border-color: #10b981 !important;
     }
   </style>
+
+  <!-- STYLE PENGATURAN CETAK RESMI PEMERINTAHAN (BEBAS OVERFLOW & SANGAT CLEAN) -->
+  <style>
+    @media print {
+      /* Reset Warna & Latar Belakang */
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        font-size: 11px !important;
+      }
+      
+      /* Sembunyikan semua elemen selain area cetak */
+      body * {
+        visibility: hidden !important;
+      }
+      
+      /* Target Area Cetak Utama */
+      #print-area-daily, #print-area-daily *,
+      #print-area-monthly, #print-area-monthly *,
+      #print-area-individual, #print-area-individual * {
+        visibility: visible !important;
+      }
+      
+      #print-area-daily, #print-area-monthly, #print-area-individual {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+      }
+
+      /* Tampilkan Kop Surat & Pengesahan */
+      .print-header {
+        display: block !important;
+        visibility: visible !important;
+      }
+      .print-footer-sig {
+        display: block !important;
+        visibility: visible !important;
+      }
+
+      /* Matikan scrollbar penampung tabel agar tidak tampil di kertas */
+      .overflow-x-auto {
+        overflow: visible !important;
+        display: block !important;
+      }
+
+      /* Pengaturan Grid Tabel Resmi UIN Ar-Raniry */
+      table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 15px !important;
+        border: 1.5px solid #000000 !important;
+        table-layout: fixed !important;
+        word-wrap: break-word !important;
+      }
+      
+      th, td {
+        border: 1px solid #000000 !important;
+        padding: 6px 8px !important;
+        color: #000000 !important;
+        font-size: 10px !important;
+        text-align: left !important;
+        background-color: transparent !important;
+        border-radius: 0 !important;
+        overflow: hidden;
+      }
+      
+      th {
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        background-color: #f3f4f6 !important;
+        text-align: center !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      /* Pengaturan Lebar Kolom yang Sempurna untuk Kertas A4 */
+      th:nth-child(1), td:nth-child(1) { width: 5% !important; text-align: center !important; }  /* No */
+      th:nth-child(2), td:nth-child(2) { width: 12% !important; }                                /* Tanggal / Nama */
+      th:nth-child(3), td:nth-child(3) { width: 12% !important; }                                /* ID / NIP */
+      th:nth-child(4), td:nth-child(4) { width: 18% !important; }                                /* Nama Pegawai (Bulanan) */
+      th:nth-child(5), td:nth-child(5) { width: 8% !important; text-align: center !important; }  /* Masuk */
+      th:nth-child(6), td:nth-child(6) { width: 8% !important; text-align: center !important; }  /* Pulang */
+      th:nth-child(7), td:nth-child(7) { width: 10% !important; text-align: center !important; } /* Status */
+      th:nth-child(8), td:nth-child(8) { width: 20% !important; }                                /* Tupoksi */
+      th:nth-child(9), td:nth-child(9) { width: 7% !important; }                                 /* Keterangan */
+      
+      /* Hapus desain badge berwarna saat dicetak agar resmi */
+      .print-status-label, .px-2.py-0\.5 {
+        border: none !important;
+        background: transparent !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        font-weight: bold !important;
+        font-size: 10px !important;
+        text-transform: uppercase !important;
+      }
+
+      /* Matikan footer & header default browser */
+      @page {
+        margin: 1.5cm 1cm 1.5cm 1cm;
+      }
+    }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
@@ -55,7 +165,7 @@
       <div class="flex items-center gap-3">
         <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-12 h-12 object-contain bg-white p-1 rounded-full border-2 border-uin-gold shadow-md">
         <div>
-          <h1 class="font-extrabold text-lg md:text-xl tracking-wide">E-ABSENSI ONLINE</h1>
+          <h1 class="font-extrabold text-lg md:text-xl tracking-wide">E-ABSENSI ONLINE PETUGAS PADA SUBBAGIAN RUMAH TANGGA</h1>
           <p class="text-xs text-uin-gold font-semibold uppercase tracking-wider">UIN Ar-Raniry Banda Aceh</p>
         </div>
       </div>
@@ -128,6 +238,16 @@
 
     <!-- 2. DASHBOARD USER -->
     <section id="page-user" class="hidden max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6">
+      
+      <!-- SPANDUK PENGUMUMAN DINAMIS DARI ADMIN -->
+      <div id="user-announcement-container" class="hidden bg-gradient-to-r from-amber-50 to-amber-100 border-l-4 border-uin-gold p-4 rounded-xl shadow-sm flex items-start gap-3">
+        <span class="text-uin-gold text-lg mt-0.5"><i class="fa-solid fa-bullhorn animate-bounce"></i></span>
+        <div>
+          <h4 class="font-extrabold text-xs text-gray-800 uppercase tracking-wider">Pengumuman Penting Subbagian RT</h4>
+          <p id="user-announcement-text" class="text-sm text-gray-700 mt-1 font-medium leading-relaxed">Pengumuman resmi akan dimuat di sini.</p>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Kiri: Profil & Reset Kredensial Akun -->
@@ -319,6 +439,12 @@
           <button onclick="switchAdminTab('tab-monthly-report')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition">
             <i class="fa-solid fa-file-invoice"></i> Laporan Bulanan
           </button>
+          <button onclick="switchAdminTab('tab-individual-report')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition">
+            <i class="fa-solid fa-user-tie"></i> Laporan Perorangan
+          </button>
+          <button onclick="switchAdminTab('tab-announcements')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition">
+            <i class="fa-solid fa-bullhorn"></i> Kelola Pengumuman
+          </button>
           <button onclick="switchAdminTab('tab-settings-workhour')" class="admin-tab-btn flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold rounded-xl text-gray-300 hover:bg-green-900 hover:text-white transition">
             <i class="fa-solid fa-clock"></i> Pengaturan Jam Kerja
           </button>
@@ -330,7 +456,7 @@
       </aside>
 
       <!-- Area Konten Utama Admin -->
-      <main class="flex-grow p-4 md:p-6 bg-gray-50 max-w-7xl">
+      <main class="flex-grow p-4 md:p-6 bg-gray-50 max-w-7xl overflow-y-auto">
         
         <!-- Tab 3.1: Ringkasan Utama Admin -->
         <div id="tab-overview" class="admin-tab-content space-y-6">
@@ -375,7 +501,7 @@
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr class="bg-gray-50 text-gray-500 font-bold uppercase text-xs border-b border-gray-200">
+                  <tr class="bg-gray-55 text-gray-500 font-bold uppercase text-xs border-b border-gray-200">
                     <th class="p-3">Nama Pegawai</th>
                     <th class="p-3">Jam Masuk</th>
                     <th class="p-3">Jam Pulang</th>
@@ -473,7 +599,7 @@
           </div>
         </div>
 
-        <!-- Tab 3.4: Laporan Kehadiran Harian -->
+        <!-- Tab 3.4: Laporan Kehadiran Harian (FORMAT RESMI) -->
         <div id="tab-daily-report" class="admin-tab-content hidden space-y-6">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -493,26 +619,41 @@
           </div>
 
           <div id="print-area-daily" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div class="hidden print-header flex items-center justify-between border-b-4 border-uin-green pb-4 mb-6">
-              <div class="flex items-center gap-3">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-12 h-12 object-contain bg-white p-1 rounded-full border border-uin-gold">
+            <!-- Kop Surat Pemerintah Lapisan Double -->
+            <div class="hidden print-header border-b-4 border-double border-black pb-2 mb-4 text-center">
+              <div class="flex items-center justify-center gap-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-16 h-18 object-contain">
                 <div>
-                  <h1 class="font-extrabold text-lg text-uin-green">UIN AR-RANIRY BANDA ACEH</h1>
-                  <p class="text-xs text-gray-500">LAPORAN PRESENSI HARIAN PEGAWAI</p>
+                  <h3 class="text-sm font-bold tracking-wide">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h3>
+                  <h2 class="text-base font-extrabold tracking-wide text-uin-green">UNIVERSITAS ISLAM NEGERI AR-RANIRY BANDA ACEH</h2>
+                  <h4 class="text-xs font-bold text-gray-700">SUBBAGIAN UMUM DAN RUMAH TANGGA</h4>
+                  <p class="text-[9px] text-gray-500 italic">Jl. Syeikh Abdur Rauf Kopelma Darussalam Banda Aceh, Telp: (0651) 7557321, Fax: (0651) 7557002</p>
+                  <p class="text-[9px] text-gray-500 italic">Situs Web: uin.ar-raniry.ac.id, Email: info@uin.ar-raniry.ac.id</p>
                 </div>
               </div>
             </div>
+
+            <div class="text-center mb-4">
+              <h3 class="font-bold text-xs uppercase underline">LAPORAN REKAPITULASI PRESENSI HARIAN PEGAWAI</h3>
+              <p id="print-meta-daily" class="text-[10px] text-gray-700 font-semibold mt-1">Hari/Tanggal: -</p>
+            </div>
+
+            <!-- SPANDUK HARI LIBUR NASIONAL DI CETAK HARIAN -->
+            <div id="daily-holiday-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 font-bold text-center text-xs"></div>
+
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse text-sm">
                 <thead>
-                  <tr class="bg-gray-50 text-gray-500 font-bold uppercase text-xs border-b border-gray-200">
-                    <th class="p-3">Nama Pegawai</th>
-                    <th class="p-3">ID / NIP</th>
-                    <th class="p-3">Masuk</th>
-                    <th class="p-3">Pulang</th>
-                    <th class="p-3">Status</th>
-                    <th class="p-3">Tugas Diselesaikan</th>
-                    <th class="p-3">Keterangan</th>
+                  <tr class="bg-gray-55 text-gray-500 font-bold uppercase text-xs border-b border-gray-200">
+                    <th class="p-3 w-[50px] text-center">NO.</th>
+                    <th class="p-3">TANGGAL</th>
+                    <th class="p-3">NIP / ID</th>
+                    <th class="p-3">NAMA PEGAWAI</th>
+                    <th class="p-3">MASUK</th>
+                    <th class="p-3">PULANG</th>
+                    <th class="p-3">STATUS</th>
+                    <th class="p-3">TUGAS SELESAI (TUPOKSI)</th>
+                    <th class="p-3">KETERANGAN</th>
                   </tr>
                 </thead>
                 <tbody id="table-daily-report-body" class="divide-y divide-gray-100 text-gray-700">
@@ -520,6 +661,27 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Lembar Pengesahan Resmi -->
+            <div class="print-footer-sig hidden mt-10">
+              <div class="flex justify-between text-xs">
+                <div class="w-1/3 text-left">
+                  <p class="font-semibold">Koordinator Lapangan,</p>
+                  <div class="h-20"></div>
+                  <p class="font-bold">___________________________</p>
+                  <p class="text-gray-500 text-[10px]">Staf Kepegawaian Subbagian RT</p>
+                </div>
+                <div class="w-1/3"></div>
+                <div class="w-1/3 text-right">
+                  <p>Banda Aceh, <span class="current-print-date">-</span></p>
+                  <p class="font-semibold">Kepala Subbagian Umum dan Rumah Tangga,</p>
+                  <div class="h-20"></div>
+                  <p class="font-bold">___________________________</p>
+                  <p class="text-gray-500 text-[10px]">NIP. ___________________________</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -566,27 +728,46 @@
           </div>
 
           <div id="print-area-monthly" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div class="hidden print-header flex items-center justify-between border-b-4 border-uin-green pb-4 mb-6">
-              <div class="flex items-center gap-3">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-12 h-12 object-contain bg-white p-1 rounded-full border border-uin-gold">
+            <!-- Kop Surat Pemerintah Lapisan Double -->
+            <div class="hidden print-header border-b-4 border-double border-black pb-2 mb-4 text-center">
+              <div class="flex items-center justify-center gap-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-16 h-18 object-contain">
                 <div>
-                  <h1 class="font-extrabold text-lg text-uin-green">UIN AR-RANIRY BANDA ACEH</h1>
-                  <p class="text-xs text-gray-500">LAPORAN REKAPITULASI BULANAN PEGAWAI</p>
+                  <h3 class="text-sm font-bold tracking-wide">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h3>
+                  <h2 class="text-base font-extrabold tracking-wide text-uin-green">UNIVERSITAS ISLAM NEGERI AR-RANIRY BANDA ACEH</h2>
+                  <h4 class="text-xs font-bold text-gray-700">SUBBAGIAN UMUM DAN RUMAH TANGGA</h4>
+                  <p class="text-[9px] text-gray-500 italic">Jl. Syeikh Abdur Rauf Kopelma Darussalam Banda Aceh, Telp: (0651) 7557321, Fax: (0651) 7557002</p>
+                  <p class="text-[9px] text-gray-500 italic">Situs Web: uin.ar-raniry.ac.id, Email: info@uin.ar-raniry.ac.id</p>
                 </div>
               </div>
             </div>
+
+            <div class="text-center mb-4">
+              <h3 class="font-bold text-xs uppercase underline">LAPORAN REKAPITULASI PRESENSI BULANAN PETUGAS KEBERSIHAN PADA SUB BAGIAN UMUM DAN RUMAH TANGGA</h3>
+              <p id="print-meta-monthly" class="text-[10px] text-gray-700 font-semibold mt-1">Periode: -</p>
+            </div>
+
+            <!-- SPANDUK RINGKASAN HARI LIBUR NASIONAL BULANAN -->
+            <div id="monthly-holiday-summary" class="hidden mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold">
+              <h4 class="font-bold border-b border-red-200 pb-1 mb-1.5 flex items-center gap-2">
+                <i class="fa-solid fa-calendar-day text-sm"></i> Daftar Hari Libur Nasional Bulan Ini:
+              </h4>
+              <ul id="monthly-holiday-list" class="list-disc pl-5 space-y-1"></ul>
+            </div>
+
             <div class="overflow-x-auto">
               <table class="w-full text-left border-collapse text-sm">
                 <thead>
                   <tr class="bg-gray-55 text-gray-500 font-bold uppercase text-xs border-b border-gray-200">
-                    <th class="p-3">Tanggal</th>
+                    <th class="p-3 w-[50px] text-center">NO.</th>
+                    <th class="p-3">TANGGAL</th>
                     <th class="p-3">NIP / ID</th>
-                    <th class="p-3">Nama Pegawai</th>
-                    <th class="p-3">Masuk</th>
-                    <th class="p-3">Pulang</th>
-                    <th class="p-3">Status</th>
-                    <th class="p-3">Tugas Selesai</th>
-                    <th class="p-3">Keterangan</th>
+                    <th class="p-3">NAMA PEGAWAI</th>
+                    <th class="p-3">MASUK</th>
+                    <th class="p-3">PULANG</th>
+                    <th class="p-3">STATUS</th>
+                    <th class="p-3">TUGAS SELESAI (TUPOKSI)</th>
+                    <th class="p-3">KETERANGAN</th>
                   </tr>
                 </thead>
                 <tbody id="table-monthly-report-body" class="divide-y divide-gray-100 text-gray-700">
@@ -594,10 +775,183 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Lembar Pengesahan Resmi -->
+            <div class="print-footer-sig hidden mt-10">
+              <div class="flex justify-between text-xs">
+                <div class="w-1/3 text-left">
+                  <p class="font-semibold">Koordinator Lapangan,</p>
+                  <div class="h-20"></div>
+                  <p class="font-bold">___________________________</p>
+                  <p class="text-gray-500 text-[10px]">Staf Kepegawaian Subbagian RT</p>
+                </div>
+                <div class="w-1/3"></div>
+                <div class="w-1/3 text-right">
+                  <p>Banda Aceh, <span class="current-print-date">-</span></p>
+                  <p class="font-semibold">Kepala Subbagian Umum dan Rumah Tangga,</p>
+                  <div class="h-20"></div>
+                  <p class="font-bold">___________________________</p>
+                  <p class="text-gray-500 text-[10px]">NIP. ___________________________</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <!-- Tab 3.6: Pengaturan Jam Kerja -->
+        <!-- TAB 3.6: Laporan Kehadiran Perorangan (Individual Report) -->
+        <div id="tab-individual-report" class="admin-tab-content hidden space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800">Laporan Rekapitulasi Perorangan</h2>
+              <p class="text-xs text-gray-500">Cetak rekap absensi detail khusus untuk satu orang petugas tertentu.</p>
+            </div>
+            <button onclick="printReport('print-area-individual')" class="bg-uin-green text-white px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover-uin-green transition shadow">
+              <i class="fa-solid fa-print"></i> Cetak Laporan Perorangan
+            </button>
+          </div>
+
+          <div class="flex flex-wrap gap-4 items-end bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+            <div class="w-full sm:w-72">
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Pilih Petugas / Pegawai</label>
+              <select id="individual-user-select" class="w-full px-4 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none font-semibold">
+                <!-- Diisi Dinamis -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Bulan</label>
+              <select id="individual-filter-month" class="px-4 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none font-semibold">
+                <option value="1">Januari</option>
+                <option value="2">Februari</option>
+                <option value="3">Maret</option>
+                <option value="4">April</option>
+                <option value="5">Mei</option>
+                <option value="6">Juni</option>
+                <option value="7" selected>Juli</option>
+                <option value="8">Agustus</option>
+                <option value="9">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tahun</label>
+              <select id="individual-filter-year" class="px-4 py-2 text-sm rounded-xl border border-gray-200 focus:outline-none font-semibold">
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+              </select>
+            </div>
+            <button onclick="loadIndividualReport()" class="bg-uin-gold text-uin-green px-6 py-2.5 rounded-xl text-sm font-extrabold hover-uin-gold transition shadow">
+              Proses Data
+            </button>
+          </div>
+
+          <div id="print-area-individual" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <!-- Kop Surat Resmi -->
+            <div class="hidden print-header border-b-4 border-double border-black pb-2 mb-4 text-center">
+              <div class="flex items-center justify-center gap-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/af/Lambang_UIN_Ar-Raniry.png" alt="Logo UIN" class="w-16 h-18 object-contain">
+                <div>
+                  <h3 class="text-sm font-bold tracking-wide">KEMENTERIAN AGAMA REPUBLIK INDONESIA</h3>
+                  <h2 class="text-base font-extrabold tracking-wide text-uin-green">UNIVERSITAS ISLAM NEGERI AR-RANIRY BANDA ACEH</h2>
+                  <h4 class="text-xs font-bold text-gray-700">SUBBAGIAN UMUM DAN RUMAH TANGGA</h4>
+                  <p class="text-[9px] text-gray-500 italic">Jl. Syeikh Abdur Rauf Kopelma Darussalam Banda Aceh, Telp: (0651) 7557321, Fax: (0651) 7557002</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center mb-4">
+              <h3 class="font-bold text-xs uppercase underline">LAPORAN REKAPITULASI PRESENSI INDIVIDUAL PEGAWAI</h3>
+              <p id="print-meta-individual" class="text-[10px] text-gray-700 font-semibold mt-1">Petugas: - | Periode: -</p>
+            </div>
+
+            <!-- Detail Biodata Petugas di Cetakan -->
+            <div class="grid grid-cols-2 gap-4 text-xs border border-gray-200 p-3 rounded-lg mb-4 bg-gray-50/50">
+              <div>
+                <p class="text-gray-500">Nama Lengkap Pegawai:</p>
+                <p id="individual-print-fullname" class="font-bold text-gray-800">-</p>
+              </div>
+              <div>
+                <p class="text-gray-500">NIP / ID Sistem:</p>
+                <p id="individual-print-nip" class="font-bold text-gray-800">-</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Unit Kerja / Lokasi Tugas:</p>
+                <p id="individual-print-dept" class="font-bold text-uin-green">-</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Rencana Tugas Harian Utama:</p>
+                <p id="individual-print-tasks" class="font-medium text-gray-600 italic">-</p>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                  <tr class="bg-gray-55 text-gray-500 font-bold uppercase text-xs border-b border-gray-200">
+                    <th class="p-3 w-[50px] text-center">NO.</th>
+                    <th class="p-3">TANGGAL</th>
+                    <th class="p-3">MASUK</th>
+                    <th class="p-3">PULANG</th>
+                    <th class="p-3">STATUS</th>
+                    <th class="p-3">TUPOKSI SELESAI</th>
+                    <th class="p-3">KETERANGAN</th>
+                  </tr>
+                </thead>
+                <tbody id="table-individual-report-body" class="divide-y divide-gray-100 text-gray-700">
+                  <!-- Diisi Dinamis -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Lembar Pengesahan Perorangan -->
+            <div class="print-footer-sig hidden mt-10">
+              <div class="flex justify-between text-xs">
+                <div class="w-1/3 text-left">
+                  <p class="font-semibold">Koordinator Lapangan,</p>
+                  <div class="h-20"></div>
+                  <p class="font-bold">___________________________</p>
+                  <p class="text-gray-500 text-[10px]">Staf Kepegawaian Subbagian RT</p>
+                </div>
+                <div class="w-1/3"></div>
+                <div class="w-1/3 text-right">
+                  <p>Banda Aceh, <span class="current-print-date">-</span></p>
+                  <p class="font-semibold">Kepala Subbagian Umum dan Rumah Tangga,</p>
+                  <div class="h-20"></div>
+                  <p class="font-bold">___________________________</p>
+                  <p class="text-gray-500 text-[10px]">NIP. ___________________________</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 3.7: Kelola Pengumuman (Manage Announcements) -->
+        <div id="tab-announcements" class="admin-tab-content hidden space-y-6">
+          <div class="max-w-xl bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Kelola Pengumuman Subbagian Rumah Tangga</h2>
+            <p class="text-xs text-gray-500 mb-6">Tulis pengumuman di bawah ini untuk diterbitkan langsung di semua dashboard petugas pelaksana.</p>
+            
+            <form id="form-announcement" onsubmit="handleSaveAnnouncement(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Teks Pengumuman Resmi</label>
+                <textarea id="setting-announcement" rows="5" class="w-full px-4 py-3 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium" placeholder="Tulis instruksi kerja baru, berita penting, atau jadwal ditiadakannya kegiatan piket..."></textarea>
+              </div>
+              <div class="flex gap-3">
+                <button type="submit" class="bg-uin-green text-white font-bold px-6 py-2.5 rounded-xl text-xs hover-uin-green transition shadow">
+                  Terbitkan Pengumuman
+                </button>
+                <button type="button" onclick="clearAnnouncement()" class="border border-gray-300 text-gray-600 px-6 py-2.5 rounded-xl text-xs hover:bg-gray-50 transition">
+                  Kosongkan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tab 3.8: Pengaturan Jam Kerja -->
         <div id="tab-settings-workhour" class="admin-tab-content hidden space-y-6">
           <div class="max-w-md bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Konfigurasi Batas Jam Kerja</h2>
@@ -638,7 +992,6 @@
             <div id="tv-clock" class="text-4xl font-black text-white tracking-widest">00:00:00</div>
             <div id="tv-date" class="text-sm font-semibold text-uin-gold">Sabtu, 11 Juli 2026</div>
           </div>
-          <!-- Tombol Pengaktif Audio Chime -->
           <button id="btn-toggle-sound" onclick="toggleAudio()" class="p-3 bg-slate-800 rounded-xl hover:bg-slate-700 text-rose-400 hover:text-white transition" title="Aktifkan Suara">
             <i id="sound-icon" class="fa-solid fa-volume-xmark"></i>
           </button>
@@ -677,13 +1030,12 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
         
-        <!-- Tabel Log Live -->
+        <!-- Live Logs Panel -->
         <div class="lg:col-span-8 bg-slate-800 rounded-2xl border border-slate-700 p-6 flex flex-col justify-between overflow-hidden relative">
           <div>
             <h3 class="text-lg font-bold text-uin-gold mb-4 flex items-center gap-2 border-b border-slate-700 pb-3">
               <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping"></span> LOG LIVE KEHADIRAN & KEGIATAN HARIAN
             </h3>
-            
             <div class="relative overflow-hidden h-[340px] w-full pause-on-hover">
               <div class="absolute w-full animate-scroll-vertical">
                 <table class="w-full text-left">
@@ -705,16 +1057,26 @@
           </div>
         </div>
 
-        <!-- Daftar Belum Absen -->
+        <!-- NEW TABLE DESIGN: BELUM MELAKUKAN ABSENSI -->
         <div class="lg:col-span-4 bg-slate-800 rounded-2xl border border-slate-700 p-6 flex flex-col justify-between overflow-hidden relative">
           <div>
             <h3 class="text-lg font-bold text-slate-300 mb-4 flex items-center gap-2 border-b border-slate-700 pb-3">
               <i class="fa-solid fa-users-slash text-amber-500"></i> BELUM MELAKUKAN ABSENSI
             </h3>
-            
             <div class="relative overflow-hidden h-[340px] w-full pause-on-hover">
-              <div id="tv-list-belum-hadir" class="absolute w-full animate-scroll-vertical space-y-2">
-                <!-- Diisi Dinamis -->
+              <div class="absolute w-full animate-scroll-vertical">
+                <table class="w-full text-left">
+                  <thead>
+                    <tr class="text-slate-400 border-b border-slate-700 text-[10px] font-bold tracking-wider uppercase">
+                      <th class="pb-3 w-[15%] text-center">NO.</th>
+                      <th class="pb-3 w-[50%]">Nama Petugas</th>
+                      <th class="pb-3 w-[35%]">Lokasi Kerja</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tv-table-belum-hadir-body" class="divide-y divide-slate-750 text-xs">
+                    <!-- Diisi Dinamis Melalui JS -->
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -722,7 +1084,6 @@
             Arahkan kursor ke area teks untuk menjeda putaran.
           </div>
         </div>
-
       </div>
 
     </section>
@@ -733,7 +1094,7 @@
   <footer id="app-footer" class="bg-gray-100 py-4 px-6 text-center text-xs text-gray-500 border-t border-gray-200">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
       <p>&copy; 2026 Universitas Islam Negeri Ar-Raniry Banda Aceh. Hak Cipta Dilindungi.</p>
-      <p>Modul Kepegawaian & Pusat Teknologi Informasi</p>
+      <p>Subbagian Umum dan Rumah Tangga UIN Ar-Raniry Banda Aceh</p>
     </div>
   </footer>
 
@@ -787,7 +1148,7 @@
   </div>
 
   <!-- MODAL KONFIRMASI HAPUS -->
-  <div id="modal-confirm" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+  <div id="modal-confirm" class="fixed inset-0 bg-black bg-opacity-55 z-50 flex items-center justify-center hidden">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4 text-center">
       <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl mx-auto">
         <i class="fa-solid fa-triangle-exclamation"></i>
@@ -803,26 +1164,6 @@
     </div>
   </div>
 
-  <!-- INLINE CSS KHUSUS CETAK -->
-  <style>
-    @media print {
-      body * { visibility: hidden; }
-      #print-area-daily, #print-area-daily *,
-      #print-area-monthly, #print-area-monthly * { visibility: visible; }
-      .print-header { display: flex !important; }
-      #print-area-daily, #print-area-monthly {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        box-shadow: none !important;
-        border: none !important;
-      }
-      #app-footer, header { display: none !important; }
-    }
-  </style>
-
-  <!-- LOGIKA UTAMA APLIKASI -->
   <script>
     let currentUser = null;
     let localDB = null;
@@ -833,26 +1174,62 @@
     
     const IS_GAS_ENVIRONMENT = typeof google !== 'undefined' && google.script && google.script.run;
     
+    // DATABASE HARI LIBUR NASIONAL INDONESIA 2026/2027
+    const INDONESIAN_HOLIDAYS = {
+      "2026-01-01": "Tahun Baru Masehi",
+      "2026-01-16": "Isra Mi'raj Nabi Muhammad SAW",
+      "2026-02-17": "Tahun Baru Imlek 2577 Kongzili",
+      "2026-03-19": "Hari Suci Nyepi (Tahun Baru Saka 1948)",
+      "2026-03-21": "Hari Raya Idul Fitri 1447 H",
+      "2026-03-22": "Hari Raya Idul Fitri 1447 H",
+      "2026-04-03": "Wafat Yesus Kristus",
+      "2026-04-05": "Kebangkitan Yesus Kristus (Paskah)",
+      "2026-05-01": "Hari Buruh Internasional",
+      "2026-05-14": "Kenaikan Yesus Kristus",
+      "2026-05-27": "Hari Raya Idul Adha 1447 H",
+      "2026-05-31": "Hari Raya Waisak 2570 BE",
+      "2026-06-01": "Hari Lahir Pancasila",
+      "2026-06-16": "Tahun Baru Islam 1448 H",
+      "2026-08-17": "Hari Kemerdekaan Republik Indonesia",
+      "2026-08-25": "Maulid Nabi Muhammad SAW",
+      "2026-12-25": "Hari Raya Natal",
+      "2027-01-01": "Tahun Baru Masehi",
+      "2027-08-17": "Hari Kemerdekaan Republik Indonesia",
+      "2027-12-25": "Hari Raya Natal"
+    };
+
+    function getHolidayName(dateStr) {
+      return INDONESIAN_HOLIDAYS[dateStr] || null;
+    }
+
+    function checkHolidayToday() {
+      const todayStr = getLocalDateString();
+      return getHolidayName(todayStr);
+    }
+    
     function initLocalDB() {
       if (!localStorage.getItem('uin_users')) {
         const dummyUsers = [
-          { userId: 'USR001', username: 'dosen1', password: '123', fullName: 'Dr. T. M. Jamil, M.A.', role: 'user', department: 'Sains dan Teknologi', assignedTasks: 'Kebersihan Kantor, Perawatan Taman, Membantu Administrasi' },
-          { userId: 'USR002', username: 'dosen2', password: '123', fullName: 'Prof. Dr. Syamsul Rijal, M.Ag.', role: 'user', department: 'Fakultas Ushuluddin', assignedTasks: 'Kebersihan Ruang Perkuliahan, Menyapu halaman' },
-          { userId: 'USR003', username: 'dosen3', password: '123', fullName: 'Dra. Nurhayati, M.Ed.', role: 'user', department: 'Tarbiyah dan Keguruan', assignedTasks: 'Kebersihan Toilet, Menjaga Kebersihan Lingkungan Kampus' },
-          { userId: 'USR004', username: 'dosen4', password: '123', fullName: 'Teuku Khairul, S.T., M.Sc.', role: 'user', department: 'Pusat Komputer (Puskom)', assignedTasks: 'Kebersihan Lingkungan, Perawatan Taman Kampus' },
-          { userId: 'USR005', username: 'dosen5', password: '123', fullName: 'Zulfian, S.Ag., M.Hum.', role: 'user', department: 'Perpustakaan Syariah', assignedTasks: 'Kebersihan Toilet dan Fasilitas Umum Perpustakaan' },
+          { userId: 'USR001', username: 'dosen1', password: '123', fullName: 'Dr. T. M. Jamil, M.A.', role: 'user', department: 'Subbagian Rumah Tangga', assignedTasks: 'Kebersihan Kantor Rektorat Utama, Perawatan Taman, Membantu Administrasi Umum' },
+          { userId: 'USR002', username: 'dosen2', password: '123', fullName: 'Prof. Dr. Syamsul Rijal, M.Ag.', role: 'user', department: 'Subbagian Rumah Tangga', assignedTasks: 'Pengawasan Kebersihan Gedung Pascasarjana' },
+          { userId: 'USR003', username: 'dosen3', password: '123', fullName: 'Dra. Nurhayati, M.Ed.', role: 'user', department: 'Subbagian Rumah Tangga', assignedTasks: 'Tata Ruang Aula Biro Rektorat UIN' },
+          { userId: 'USR019', username: 'petugas19', password: '123', fullName: 'Maulida', role: 'user', department: 'Subbagian Rumah Tangga', assignedTasks: 'Halaman Gedung, Trotoar dan Jalan Depan Pusat Pengembangan Bahasa Sebelah Timur' },
           { userId: 'ADM001', username: 'admin', password: '1122', fullName: 'Puskom Admin Rektorat', role: 'admin', department: 'Biro Kepegawaian', assignedTasks: 'Semua Akses Kontrol Sistem' }
         ];
         localStorage.setItem('uin_users', JSON.stringify(dummyUsers));
       }
       if (!localStorage.getItem('uin_attendance')) {
         const dummyAttendance = [
-          { id: '1', userId: 'USR001', fullName: 'Dr. T. M. Jamil, M.A.', date: '2026-07-10', checkIn: '07:45:12', checkOut: '16:05:00', status: 'Tepat Waktu', notes: 'Hadir Pagi', tasksCompleted: 'Kebersihan Kantor, Perawatan Taman, Membantu Administrasi' }
+          { id: '1', userId: 'USR001', fullName: 'Dr. T. M. Jamil, M.A.', date: '2026-07-10', checkIn: '07:45:12', checkOut: '16:05:00', status: 'Tepat Waktu', notes: 'Hadir Pagi', tasksCompleted: 'Kebersihan Biro Rektorat Lt 1' }
         ];
         localStorage.setItem('uin_attendance', JSON.stringify(dummyAttendance));
       }
       if (!localStorage.getItem('uin_settings')) {
-        const dummySettings = { checkInTarget: '08:00:00', checkOutTarget: '16:00:00' };
+        const dummySettings = { 
+          checkInTarget: '08:00:00', 
+          checkOutTarget: '16:00:00',
+          announcementText: 'Semua petugas Subbagian Rumah Tangga wajib merapikan peralatan kerja sebelum melakukan absensi pulang.'
+        };
         localStorage.setItem('uin_settings', JSON.stringify(dummySettings));
       }
     }
@@ -873,7 +1250,6 @@
         navigateTo('page-login');
       }
 
-      // Detektor real-time tab syncing saat testing lokal
       window.addEventListener('storage', function(e) {
         if (e.key === 'uin_attendance' && document.getElementById('page-tv').classList.contains('hidden') === false) {
           loadTvMonitorData();
@@ -900,7 +1276,7 @@
         document.getElementById('header-user-info').classList.add('hidden');
         loadTvMonitorData();
         if (window.tvInterval) clearInterval(window.tvInterval);
-        window.tvInterval = setInterval(loadTvMonitorData, 3000); // Polling cepat 3 detik
+        window.tvInterval = setInterval(loadTvMonitorData, 3000);
       } else {
         document.getElementById('app-footer').classList.remove('hidden');
         if (window.tvInterval) clearInterval(window.tvInterval);
@@ -919,7 +1295,7 @@
       
       const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
       const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      const dateStr = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      const dateStr = `${days[now.getDay()]} , ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
       
       const liveTimeEl = document.getElementById('live-time');
       const liveDateEl = document.getElementById('live-date');
@@ -1026,9 +1402,6 @@
       showToast('Anda berhasil keluar.');
     }
 
-    /**
-     * SIMPAN PERUBAHAN AKUN SECARA MANDIRI OLEH PETUGAS
-     */
     function saveSelfCredential() {
       const newUsername = document.getElementById('self-username').value.trim();
       const newPassword = document.getElementById('self-password').value.trim();
@@ -1059,7 +1432,6 @@
           toggleLoading(false);
           const users = JSON.parse(localStorage.getItem('uin_users')) || [];
           
-          // Periksa bentrok username di simulasi lokal
           const isTaken = users.some(u => u.username.toLowerCase() === newUsername.toLowerCase() && u.userId !== currentUser.userId);
           if (isTaken) {
             showToast('Username ini sudah dipakai petugas lain!', 'error');
@@ -1086,7 +1458,6 @@
       document.getElementById('user-department').textContent = currentUser.department;
       document.getElementById('user-display-id').textContent = currentUser.userId;
       
-      // Isi isian form reset mandiri
       document.getElementById('self-username').value = currentUser.username;
       document.getElementById('self-password').value = currentUser.password;
       
@@ -1099,6 +1470,33 @@
       
       loadWorkHourInUserDashboard();
       loadUserAttendanceHistory();
+      displayActiveAnnouncement();
+    }
+
+    function displayActiveAnnouncement() {
+      const container = document.getElementById('user-announcement-container');
+      const textEl = document.getElementById('user-announcement-text');
+      
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(settings) {
+            if (settings && settings.announcementText && settings.announcementText.trim() !== '') {
+              textEl.textContent = settings.announcementText;
+              container.classList.remove('hidden');
+            } else {
+              container.classList.add('hidden');
+            }
+          })
+          .getSettings();
+      } else {
+        const settings = JSON.parse(localStorage.getItem('uin_settings'));
+        if (settings && settings.announcementText && settings.announcementText.trim() !== '') {
+          textEl.textContent = settings.announcementText;
+          container.classList.remove('hidden');
+        } else {
+          container.classList.add('hidden');
+        }
+      }
     }
 
     function loadWorkHourInUserDashboard() {
@@ -1156,14 +1554,17 @@
       data.forEach(row => {
         const tr = document.createElement('tr');
         tr.className = "border-b border-gray-100 hover:bg-gray-50 transition duration-150";
-        const statusClass = row.status === 'Tepat Waktu' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+        
+        const holidayName = getHolidayName(row.date);
+        const statusClass = holidayName ? 'bg-red-100 text-red-800' : (row.status === 'Tepat Waktu' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800');
+        const displayStatus = holidayName ? `Libur: ${holidayName}` : row.status;
         
         tr.innerHTML = `
           <td class="p-3 font-semibold text-gray-800">${row.date}</td>
           <td class="p-3 font-medium text-emerald-700">${row.checkIn || '-'}</td>
           <td class="p-3 font-medium text-amber-700">${row.checkOut || '-'}</td>
           <td class="p-3">
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusClass}">${row.status}</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${statusClass}">${displayStatus}</span>
           </td>
           <td class="p-3 text-[11px] text-gray-600 max-w-[200px] truncate" title="${row.tasksCompleted || ''}">${row.tasksCompleted || '-'}</td>
           <td class="p-3 text-gray-500 italic max-w-[120px] truncate" title="${row.notes || ''}">${row.notes || '-'}</td>
@@ -1176,10 +1577,39 @@
       const containerIn = document.getElementById('container-clock-in');
       const containerOut = document.getElementById('container-clock-out');
       
-      // Ambil jam saat ini di client
       const currentHour = new Date().getHours();
+      const holidayToday = checkHolidayToday();
+
+      if (holidayToday) {
+        containerIn.innerHTML = `
+          <div class="border-2 border-red-500 bg-red-50 rounded-2xl p-6 h-48 flex flex-col justify-between shadow-inner">
+            <div class="flex justify-between items-center">
+              <span class="p-2 bg-red-100 text-red-800 rounded-lg text-xs font-bold"><i class="fa-solid fa-calendar-xmark"></i> Libur Nasional</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-red-600">OFFLINE</span>
+            </div>
+            <div class="text-center py-2">
+              <p class="text-[10px] text-red-500 font-bold uppercase tracking-widest">Hari Kerja Diliburkan</p>
+              <h4 class="text-xs font-extrabold text-red-700 mt-2">${holidayToday.toUpperCase()}</h4>
+              <p class="text-[11px] text-red-500 font-semibold italic mt-1">Sistem Absensi Ditutup</p>
+            </div>
+          </div>
+        `;
+        containerOut.innerHTML = `
+          <div class="border-2 border-red-500 bg-red-50 rounded-2xl p-6 h-48 flex flex-col justify-between shadow-inner">
+            <div class="flex justify-between items-center">
+              <span class="p-2 bg-red-100 text-red-800 rounded-lg text-xs font-bold"><i class="fa-solid fa-calendar-xmark"></i> Libur Nasional</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-red-600">OFFLINE</span>
+            </div>
+            <div class="text-center py-2">
+              <p class="text-[10px] text-red-500 font-bold uppercase tracking-widest">Hari Kerja Diliburkan</p>
+              <h4 class="text-xs font-extrabold text-red-700 mt-2">${holidayToday.toUpperCase()}</h4>
+              <p class="text-[11px] text-red-500 font-semibold italic mt-1">Sistem Absensi Ditutup</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
       
-      // 1. RENDER KARTU DATANG / MASUK
       if (todayLog && todayLog.checkIn) {
         containerIn.innerHTML = `
           <div class="border-2 border-emerald-500 bg-emerald-950/20 rounded-2xl p-6 h-48 flex flex-col justify-between shadow-inner">
@@ -1212,7 +1642,6 @@
         `;
       }
 
-      // 2. RENDER KARTU PULANG / SELESAI (Dapat ditekan kapan saja sampai dengan pukul 20:00 WIB)
       if (todayLog && todayLog.checkOut) {
         containerOut.innerHTML = `
           <div class="border-2 border-amber-500 bg-amber-950/20 rounded-2xl p-6 h-48 flex flex-col justify-between shadow-inner">
@@ -1263,6 +1692,12 @@
     }
 
     function submitAttendance(type) {
+      const holidayToday = checkHolidayToday();
+      if (holidayToday) {
+        showToast(`Ditolak: Absensi ditutup karena Hari Libur Nasional (${holidayToday})!`, 'error');
+        return;
+      }
+
       const notes = document.getElementById('attendance-notes').value.trim();
       const tasksStr = currentUser.assignedTasks || 'Tugas Umum Operasional Harian';
       
@@ -1337,7 +1772,6 @@
           } else {
             const index = atts.findIndex(a => a.userId === currentUser.userId && a.date === today);
             if (index === -1) {
-              // Mode simulasi offline: Izinkan penulisan absen pulang instan walau absen masuk belum terbuat
               atts.push({
                 id: 'ATT_' + Date.now(),
                 userId: currentUser.userId,
@@ -1365,9 +1799,6 @@
       }
     }
 
-    /**
-     * ADMINISTRATOR PANEL LOGIC
-     */
     function switchAdminTab(tabId) {
       document.querySelectorAll('.admin-tab-content').forEach(content => {
         content.classList.add('hidden');
@@ -1384,6 +1815,8 @@
       else if (tabId === 'tab-manual-input') loadAdminManualForm();
       else if (tabId === 'tab-daily-report') loadDailyReport();
       else if (tabId === 'tab-monthly-report') loadMonthlyReport();
+      else if (tabId === 'tab-individual-report') loadAdminIndividualForm();
+      else if (tabId === 'tab-announcements') loadAdminAnnouncementForm();
       else if (tabId === 'tab-settings-workhour') loadAdminSettingsForm();
     }
 
@@ -1444,9 +1877,6 @@
       });
     }
 
-    /**
-     * CRUD PETUGAS TAB MENU
-     */
     function loadAdminPetugasTab() {
       toggleLoading(true);
       if (IS_GAS_ENVIRONMENT) {
@@ -1642,9 +2072,6 @@
       }
     }
 
-    /**
-     * KONTROL INPUT ABSEN MANUAL ADMIN
-     */
     function loadAdminManualForm() {
       const select = document.getElementById('manual-user-select');
       select.innerHTML = '<option value="">-- Pilih Pegawai --</option>';
@@ -1723,13 +2150,19 @@
       }
     }
 
-    /**
-     * LAPORAN HARIAN & BULANAN ADMIN
-     */
     function loadDailyReport() {
       const selectedDate = document.getElementById('daily-filter-date').value;
       if (!selectedDate) return;
       toggleLoading(true);
+
+      const holidayName = getHolidayName(selectedDate);
+      const dailyBanner = document.getElementById('daily-holiday-banner');
+      if (holidayName) {
+        dailyBanner.textContent = `HARI LIBUR NASIONAL: ${holidayName.toUpperCase()} (SISTEM ABSENSI DINONAKTIFKAN)`;
+        dailyBanner.classList.remove('hidden');
+      } else {
+        dailyBanner.classList.add('hidden');
+      }
 
       if (IS_GAS_ENVIRONMENT) {
         google.script.run
@@ -1737,7 +2170,7 @@
             toggleLoading(false);
             if (res.success) {
               const dailyData = res.data.filter(a => a.date === selectedDate);
-              renderDailyReportTable(dailyData);
+              renderDailyReportTable(dailyData, holidayName);
             }
           })
           .getMonthlyReport(selectedDate.split('-')[1], selectedDate.split('-')[0]);
@@ -1746,28 +2179,40 @@
           toggleLoading(false);
           const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
           const daily = atts.filter(a => a.date === selectedDate);
-          renderDailyReportTable(daily);
+          renderDailyReportTable(daily, holidayName);
         }, 300);
       }
     }
 
-    function renderDailyReportTable(data) {
+    function renderDailyReportTable(data, holidayName) {
       const tbody = document.getElementById('table-daily-report-body');
       tbody.innerHTML = '';
+      
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-400">Tidak ada data kehadiran pada hari ini.</td></tr>`;
+        if (holidayName) {
+          tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-red-600 font-extrabold bg-red-50 border border-red-200">HARI LIBUR NASIONAL: ${holidayName.toUpperCase()} <br><span class="text-xs font-normal text-red-500">Seluruh tugas dinas ditiadakan.</span></td></tr>`;
+        } else {
+          tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-400">Tidak ada data kehadiran pada hari ini.</td></tr>`;
+        }
         return;
       }
-      data.forEach(row => {
+      
+      data.forEach((row, index) => {
         const tr = document.createElement('tr');
         tr.className = "border-b border-gray-100 text-xs hover:bg-slate-50";
-        const statusStyle = row.status === 'Tepat Waktu' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+        
+        const rowHoliday = getHolidayName(row.date);
+        const displayStatus = rowHoliday ? `Libur: ${rowHoliday}` : row.status;
+        const statusStyle = rowHoliday ? 'text-red-600 font-bold' : (row.status === 'Tepat Waktu' ? 'text-green-700 font-bold' : 'text-red-700 font-bold');
+        
         tr.innerHTML = `
-          <td class="p-3 font-bold text-gray-800">${row.fullName}</td>
+          <td class="p-3 text-center font-bold text-gray-500">${index + 1}.</td>
+          <td class="p-3 font-semibold text-slate-500">${row.date}</td>
           <td class="p-3 font-semibold text-slate-500">${row.userId}</td>
+          <td class="p-3 font-bold text-gray-800">${row.fullName}</td>
           <td class="p-3 font-medium text-emerald-700">${row.checkIn || '-'}</td>
           <td class="p-3 font-medium text-amber-700">${row.checkOut || '-'}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${statusStyle}">${row.status}</span></td>
+          <td class="p-3 text-center"><span class="${statusStyle}">${displayStatus}</span></td>
           <td class="p-3 text-slate-700 max-w-[200px] truncate" title="${row.tasksCompleted || ''}">${row.tasksCompleted || '-'}</td>
           <td class="p-3 italic text-gray-500 max-w-[120px] truncate" title="${row.notes || ''}">${row.notes || '-'}</td>
         `;
@@ -1779,6 +2224,29 @@
       const month = document.getElementById('report-filter-month').value;
       const year = document.getElementById('report-filter-year').value;
       toggleLoading(true);
+
+      const prefix = `${year}-${String(month).padStart(2, '0')}`;
+      const holidaysInMonth = [];
+      for (const [dateStr, name] of Object.entries(INDONESIAN_HOLIDAYS)) {
+        if (dateStr.startsWith(prefix)) {
+          holidaysInMonth.push({ date: dateStr, name });
+        }
+      }
+
+      const summaryDiv = document.getElementById('monthly-holiday-summary');
+      const listUl = document.getElementById('monthly-holiday-list');
+      listUl.innerHTML = '';
+      
+      if (holidaysInMonth.length > 0) {
+        holidaysInMonth.forEach(h => {
+          const li = document.createElement('li');
+          li.innerHTML = `<span class="font-bold">${h.date}</span> - <span class="text-red-600">${h.name}</span>`;
+          listUl.appendChild(li);
+        });
+        summaryDiv.classList.remove('hidden');
+      } else {
+        summaryDiv.classList.add('hidden');
+      }
 
       if (IS_GAS_ENVIRONMENT) {
         google.script.run
@@ -1793,7 +2261,6 @@
         setTimeout(() => {
           toggleLoading(false);
           const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
-          const prefix = `${year}-${String(month).padStart(2, '0')}`;
           const filtered = atts.filter(a => a.date.startsWith(prefix));
           renderMonthlyReportTable(filtered);
         }, 400);
@@ -1804,21 +2271,26 @@
       const tbody = document.getElementById('table-monthly-report-body');
       tbody.innerHTML = '';
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-400 font-semibold">Tidak ada data bulanan.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-400 font-semibold">Tidak ada data bulanan.</td></tr>`;
         return;
       }
       data.sort((a, b) => new Date(b.date) - new Date(a.date));
-      data.forEach(row => {
+      data.forEach((row, index) => {
         const tr = document.createElement('tr');
         tr.className = "border-b border-gray-100 text-xs hover:bg-slate-50";
-        const statusStyle = row.status === 'Tepat Waktu' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+        
+        const rowHoliday = getHolidayName(row.date);
+        const displayStatus = rowHoliday ? `Libur: ${rowHoliday}` : row.status;
+        const statusStyle = rowHoliday ? 'text-red-600 font-bold' : (row.status === 'Tepat Waktu' ? 'text-green-700 font-bold' : 'text-red-700 font-bold');
+        
         tr.innerHTML = `
+          <td class="p-3 text-center font-bold text-gray-500">${index + 1}.</td>
           <td class="p-3 font-semibold text-slate-500">${row.date}</td>
           <td class="p-3 font-semibold text-slate-500">${row.userId}</td>
           <td class="p-3 font-bold text-gray-800">${row.fullName}</td>
           <td class="p-3 font-medium text-emerald-700">${row.checkIn || '-'}</td>
           <td class="p-3 font-medium text-amber-700">${row.checkOut || '-'}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${statusStyle}">${row.status}</span></td>
+          <td class="p-3 text-center"><span class="${statusStyle}">${displayStatus}</span></td>
           <td class="p-3 text-slate-600 max-w-[200px] truncate" title="${row.tasksCompleted || ''}">${row.tasksCompleted || '-'}</td>
           <td class="p-3 italic text-gray-400 max-w-[120px] truncate" title="${row.notes || ''}">${row.notes || '-'}</td>
         `;
@@ -1826,9 +2298,165 @@
       });
     }
 
-    /**
-     * PENGATURAN JAM KERJA DI PANEL ADMIN
-     */
+    function loadAdminIndividualForm() {
+      const select = document.getElementById('individual-user-select');
+      select.innerHTML = '<option value="">-- Pilih Petugas Pelaksana --</option>';
+      
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            if (res.success) {
+              res.data.forEach(user => {
+                const opt = document.createElement('option');
+                opt.value = user.userId;
+                opt.textContent = `${user.fullName} (${user.userId})`;
+                select.appendChild(opt);
+              });
+            }
+          })
+          .getUsersList();
+      } else {
+        const users = JSON.parse(localStorage.getItem('uin_users')).filter(u => u.role === 'user');
+        users.forEach(user => {
+          const opt = document.createElement('option');
+          opt.value = user.userId;
+          opt.textContent = `${user.fullName} (${user.userId})`;
+          select.appendChild(opt);
+        });
+      }
+    }
+
+    function loadIndividualReport() {
+      const userId = document.getElementById('individual-user-select').value;
+      const month = document.getElementById('individual-filter-month').value;
+      const year = document.getElementById('individual-filter-year').value;
+      
+      if (!userId) {
+        showToast('Silakan pilih salah satu nama petugas terlebih dahulu!', 'error');
+        return;
+      }
+      
+      toggleLoading(true);
+
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(response) {
+            toggleLoading(false);
+            if (response.success) {
+              google.script.run
+                .withSuccessHandler(function(uRes) {
+                  const targetUser = uRes.data.find(u => u.userId === userId);
+                  processIndividualRender(response.data, targetUser, month, year);
+                })
+                .getUsersList();
+            }
+          })
+          .getUserMonthlyReport(userId, month, year);
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          const atts = JSON.parse(localStorage.getItem('uin_attendance')) || [];
+          const prefix = `${year}-${String(month).padStart(2, '0')}`;
+          const filtered = atts.filter(a => a.userId === userId && a.date.startsWith(prefix));
+          
+          const users = JSON.parse(localStorage.getItem('uin_users'));
+          const targetUser = users.find(u => u.userId === userId);
+          
+          processIndividualRender(filtered, targetUser, month, year);
+        }, 400);
+      }
+    }
+
+    function processIndividualRender(attendanceData, userObj, month, year) {
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      
+      document.getElementById('print-meta-individual').textContent = `Petugas: ${userObj.fullName} | Periode: ${months[month - 1]} ${year}`;
+      document.getElementById('individual-print-fullname').textContent = userObj.fullName;
+      document.getElementById('individual-print-nip').textContent = userObj.userId;
+      document.getElementById('individual-print-dept').textContent = userObj.department;
+      document.getElementById('individual-print-tasks').textContent = userObj.assignedTasks || 'Tugas Umum Operasional Harian';
+      
+      const tbody = document.getElementById('table-individual-report-body');
+      tbody.innerHTML = '';
+      
+      if (attendanceData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-400">Tidak ada riwayat presensi petugas ini pada periode terpilih.</td></tr>`;
+        return;
+      }
+      
+      attendanceData.sort((a, b) => new Date(a.date) - new Date(b.date));
+      attendanceData.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-gray-100 text-xs hover:bg-slate-50";
+        
+        const rowHoliday = getHolidayName(row.date);
+        const displayStatus = rowHoliday ? `Libur: ${rowHoliday}` : row.status;
+        const statusStyle = rowHoliday ? 'text-red-600 font-bold' : (row.status === 'Tepat Waktu' ? 'text-green-700 font-bold' : 'text-red-700 font-bold');
+        
+        tr.innerHTML = `
+          <td class="p-3 text-center font-bold text-gray-500">${index + 1}.</td>
+          <td class="p-3 font-semibold text-slate-500">${row.date}</td>
+          <td class="p-3 font-medium text-emerald-700">${row.checkIn || '-'}</td>
+          <td class="p-3 font-medium text-amber-700">${row.checkOut || '-'}</td>
+          <td class="p-3 text-center"><span class="${statusStyle}">${displayStatus}</span></td>
+          <td class="p-3 text-slate-600 max-w-[260px] truncate" title="${row.tasksCompleted || ''}">${row.tasksCompleted || '-'}</td>
+          <td class="p-3 italic text-gray-400 max-w-[120px] truncate" title="${row.notes || ''}">${row.notes || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function loadAdminAnnouncementForm() {
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(settings) {
+            document.getElementById('setting-announcement').value = settings.announcementText || '';
+          })
+          .getSettings();
+      } else {
+        const settings = JSON.parse(localStorage.getItem('uin_settings')) || { announcementText: '' };
+        document.getElementById('setting-announcement').value = settings.announcementText;
+      }
+    }
+
+    function handleSaveAnnouncement(event) {
+      event.preventDefault();
+      const txt = document.getElementById('setting-announcement').value.trim();
+      
+      const localSettings = JSON.parse(localStorage.getItem('uin_settings')) || {};
+      localSettings.announcementText = txt;
+      localStorage.setItem('uin_settings', JSON.stringify(localSettings));
+      
+      toggleLoading(true);
+
+      if (IS_GAS_ENVIRONMENT) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            toggleLoading(false);
+            if (res.success) {
+              showToast('Pengumuman resmi berhasil diterbitkan ke seluruh petugas!');
+            } else {
+              showToast(res.message, 'error');
+            }
+          })
+          .withFailureHandler(function(err) {
+            toggleLoading(false);
+            showToast('Koneksi lambat, namun pengumuman telah disimpan di browser lokal Anda.', 'success');
+            console.warn('Apps Script Error: ', err);
+          })
+          .saveAnnouncementText(txt);
+      } else {
+        setTimeout(() => {
+          toggleLoading(false);
+          showToast('Pengumuman resmi berhasil diperbarui secara lokal!');
+        }, 150);
+      }
+    }
+
+    function clearAnnouncement() {
+      document.getElementById('setting-announcement').value = '';
+    }
+
     function loadAdminSettingsForm() {
       if (IS_GAS_ENVIRONMENT) {
         google.script.run
@@ -1864,20 +2492,42 @@
       } else {
         setTimeout(() => {
           toggleLoading(false);
-          const settings = { checkInTarget: inVal, checkOutTarget: outVal };
+          const settings = JSON.parse(localStorage.getItem('uin_settings')) || {};
+          settings.checkInTarget = inVal;
+          settings.checkOutTarget = outVal;
           localStorage.setItem('uin_settings', JSON.stringify(settings));
           showToast('Jam kerja lokal berhasil disesuaikan!');
         }, 400);
       }
     }
 
+    function getIndonesianFormattedDate(dateObj) {
+      const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+      return `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+    }
+
     function printReport(areaId) {
+      const today = new Date();
+      document.querySelectorAll('.current-print-date').forEach(el => {
+        el.textContent = getIndonesianFormattedDate(today);
+      });
+      
+      if (areaId === 'print-area-daily') {
+        const dateVal = document.getElementById('daily-filter-date').value;
+        if (dateVal) {
+          const dObj = new Date(dateVal);
+          document.getElementById('print-meta-daily').textContent = 'Hari/Tanggal: ' + getIndonesianFormattedDate(dObj);
+        }
+      } else if (areaId === 'print-area-monthly') {
+        const monthVal = document.getElementById('report-filter-month').value;
+        const yearVal = document.getElementById('report-filter-year').value;
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        document.getElementById('print-meta-monthly').textContent = 'Periode: ' + months[monthVal - 1] + ' ' + yearVal;
+      }
+      
       window.print();
     }
 
-    /**
-     * TV MONITOR DISPLAY REAL-TIME & AUDIO API SYSTEM
-     */
     function toggleAudio() {
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -1889,7 +2539,7 @@
         btn.className = "p-3 bg-emerald-800 rounded-xl hover:bg-emerald-700 text-white transition";
         icon.className = "fa-solid fa-volume-high";
         btn.title = "Matikan Suara";
-        playChime(); // Tes chime saat diaktifkan
+        playChime();
       } else {
         btn.className = "p-3 bg-slate-800 rounded-xl hover:bg-slate-700 text-rose-400 hover:text-white transition";
         icon.className = "fa-solid fa-volume-xmark";
@@ -1909,12 +2559,12 @@
         gainNode.connect(audioContext.destination);
 
         osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-        osc1.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.15); // E5
+        osc1.frequency.setValueAtTime(523.25, audioContext.currentTime);
+        osc1.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.15);
 
         osc2.type = 'triangle';
-        osc2.frequency.setValueAtTime(1046.50, audioContext.currentTime); // C6
-        osc2.frequency.setValueAtTime(1318.51, audioContext.currentTime + 0.15); // E6
+        osc2.frequency.setValueAtTime(1046.50, audioContext.currentTime);
+        osc2.frequency.setValueAtTime(1318.51, audioContext.currentTime + 0.15);
 
         gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.8);
@@ -1989,7 +2639,6 @@
       if (hadirList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Menunggu petugas absensi hari ini...</td></tr>`;
       } else {
-        // Urutkan real-time log: Yang baru absen diletakkan paling atas (Newest First)
         hadirList.sort((a, b) => {
           const tA = a.checkIn || '00:00:00';
           const tB = b.checkIn || '00:00:00';
@@ -1998,11 +2647,8 @@
 
         hadirList.forEach((row, index) => {
           const tr = document.createElement('tr');
-          
-          // Flash efek gemetar dan glow jika data baru masuk
           const isLatest = index === 0 && isNewDataIn;
           tr.className = `border-b border-slate-750 transition-all duration-300 ${isLatest ? 'glow-new-log bg-emerald-950/40' : 'hover:bg-slate-800/50'}`;
-          
           const statusStyle = row.status === 'Tepat Waktu' ? 'text-emerald-400 font-extrabold' : 'text-rose-400 font-extrabold';
           
           tr.innerHTML = `
@@ -2023,34 +2669,32 @@
         }
       }
       
-      const listContainer = document.getElementById('tv-list-belum-hadir');
-      listContainer.innerHTML = '';
+      // RENDERING TABEL UNTUK DAFTAR YANG BELUM ABSENSI
+      const tbodyBelum = document.getElementById('tv-table-belum-hadir-body');
+      tbodyBelum.innerHTML = '';
       
       if (belumHadirList.length === 0) {
-        listContainer.innerHTML = `
-          <div class="bg-emerald-950/40 p-4 rounded-xl border border-emerald-800 text-center text-emerald-400 font-bold">
-            <i class="fa-solid fa-circle-check mr-2"></i> Semua petugas telah hadir hari ini!
-          </div>
+        tbodyBelum.innerHTML = `
+          <tr>
+            <td colspan="3" class="p-4 text-center text-emerald-400 font-bold bg-emerald-950/20 rounded-xl">
+              <i class="fa-solid fa-circle-check mr-2"></i> Semua petugas telah hadir hari ini!
+            </td>
+          </tr>
         `;
       } else {
-        belumHadirList.forEach(user => {
-          const div = document.createElement('div');
-          div.className = "bg-slate-750/50 p-3 rounded-xl border border-slate-700 flex justify-between items-center";
-          div.innerHTML = `
-            <div>
-              <h5 class="text-xs font-bold text-white">${user.fullName}</h5>
-              <p class="text-[10px] text-slate-400 uppercase font-semibold tracking-wider">${user.department || 'Dosen / Staf'}</p>
-            </div>
-            <span class="text-[9px] font-extrabold px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-md border border-amber-500/20">BELUM ABSEN</span>
+        belumHadirList.forEach((user, index) => {
+          const tr = document.createElement('tr');
+          tr.className = "border-b border-slate-750 hover:bg-slate-800/30 transition-all duration-150";
+          tr.innerHTML = `
+            <td class="py-3 text-center text-slate-400 font-bold">${index + 1}.</td>
+            <td class="py-3 font-semibold text-rose-300">${user.fullName}</td>
+            <td class="py-3 text-slate-400 font-medium">${user.department || '-'}</td>
           `;
-          listContainer.appendChild(div);
+          tbodyBelum.appendChild(tr);
         });
       }
     }
 
-    /**
-     * TOGGLE PASSWORD VISIBILITY FUNCTION
-     */
     function togglePasswordVisibility(inputId, iconId) {
       const passwordInput = document.getElementById(inputId);
       const toggleIcon = document.getElementById(iconId);
